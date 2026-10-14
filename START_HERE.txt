@@ -1,0 +1,49 @@
+SANKET — MINE INTELLIGENCE
+
+START THE APP
+1. Extract this ZIP into a normal folder.
+2. Install Node.js 24 LTS from https://nodejs.org if needed.
+3. Open the included .env file in a text editor and paste your key after:
+   GEMINI_API_KEY=
+   Keep the model setting unless your account requires a different text model.
+   Save the file. On Mac, press Command + Shift + . to show hidden files.
+   If .env is missing, make a copy of .env.example and name it .env.
+4. On Mac, open "Launch on Mac.command". On Windows, open "Launch on Windows.bat".
+5. The first launch downloads dependencies. Keep the terminal window open.
+6. Open the Local address printed there, normally http://127.0.0.1:5173.
+
+If double-click launch is unavailable, open a terminal in the extracted folder:
+   npm ci
+   npm run dev
+
+Restart the app after changing .env. Your key stays on the server; there is no
+connection button, API-key field or model selector in the website.
+The included .env is blank and contains no real credential. Keep your edited copy private.
+Without a key, or if the answer service is unavailable, source search and book-evidence
+answers still work. Full conversational answers require a working key and internet.
+
+USE THE ASSISTANT
+- Ask SANKET: ask about incidents, causes, inquiry findings and prevention.
+- Your mine context: enter mine type, working method and known conditions.
+- Officer briefing: create a starting fire review with proposed checks and owners.
+- Case library: search 622 accident accounts; the fire filter contains 14 cases.
+- Knowledge base: open the two original SANKET books.
+- Citation buttons: read the source passage and open its PDF page.
+
+CLASSROOM DEMO
+1. "Why did the Khadia fuel-tank fire happen, and how could it be prevented?"
+2. Open a citation and its original PDF page.
+3. Set context: Coal / Opencast / burning dump and diesel equipment.
+4. Build the officer briefing and review its proposed inspections and responsibilities.
+
+TECHNICAL NOTES
+The fitted search model combines BM25 keyword retrieval with TF-IDF/LSA semantic
+retrieval. A server-side language model generates answers from retrieved evidence.
+The architecture and provider details are documented accurately in README.md.
+
+The app has been checked locally. Provider integration tests use simulated responses;
+live generation still needs your key. The Windows launcher has not been run on Windows.
+This ZIP is a local app package, not an online deployment.
+
+SANKET contains historical accident reports. Check cited evidence and local conditions;
+this assistant does not certify mine safety or replace authorized site procedures.

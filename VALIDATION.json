@@ -1,0 +1,50 @@
+{
+  "checkedAt": "2026-10-14T15:57:07Z",
+  "release": "cleaned final local package",
+  "automatedChecks": {
+    "lint": "passed",
+    "typecheck": "passed",
+    "productionBuild": "passed",
+    "offlineCleanInstallDryRun": "passed",
+    "mockedProviderChecks": 19,
+    "backendRegressionGroups": 9,
+    "serverCredentialIsolation": "passed",
+    "controlledLiveProviderGeneration": "not tested"
+  },
+  "retrievalEvaluation": {
+    "queries": 18,
+    "hitWithinTop6": 18,
+    "top1": 16,
+    "note": "Known-case development checks, not an independent field or safety benchmark."
+  },
+  "corpusAudit": {
+    "sourcePdfPages": 671,
+    "indexedPages": 631,
+    "structuredCases": 622,
+    "confirmedFireCases": 14,
+    "indexedPassages": 1704,
+    "sourcePdfHashes": "match data/manifest.json",
+    "caseOpeningAnchors": "622 of 622 found in their cited PDF page ranges"
+  },
+  "browserChecks": [
+    "Home and Ask SANKET flow load in the production build",
+    "Khadia fuel-fire question returns C-2016-29 without an unrelated same-name case",
+    "Inquiry findings and proposed actions remain separate",
+    "Citation drawer shows the extracted passage and correct PDF page link",
+    "Answer download works",
+    "Mine-context dialog opens with accessible labelled controls"
+  ],
+  "privacyAndPackaging": {
+    "clientBundleProviderOrCredentialScan": "passed",
+    "browserCredentialOverrides": "rejected",
+    "releaseEnvironmentFile": "blank template",
+    "sourceBooksIncluded": true,
+    "deployment": "not performed; final ZIP requested"
+  },
+  "limits": [
+    "The corpus is historical and cannot confirm current site conditions or current legal requirements.",
+    "A citation validates the referenced source ID; it does not independently prove every generated sentence.",
+    "Live generation still depends on the user's server-side API key, model availability and quota.",
+    "The Windows launcher is included but was not executed on Windows."
+  ]
+}
