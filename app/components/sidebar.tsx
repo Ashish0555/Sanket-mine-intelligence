@@ -152,8 +152,8 @@ export function Sidebar({
           <span>SYSTEM STATUS</span>
           <ShieldCheck size={14} />
         </div>
-        <strong>622 DGMS Cases Indexed</strong>
-        <span>Pillared RAG Engine v1.2 (Active)</span>
+        <strong>Database: 622 DGMS Cases Indexed</strong>
+        <span>LLM Status: Operational</span>
         <div className="status-card-divider" />
         <small>
           <span className={"status-dot " + (online ? "" : "offline")} />

@@ -113,6 +113,43 @@ const formatTitle = (view: View) =>
     books: "Knowledge base",
   })[view];
 
+function suggestionsForTurn(turn?: Turn): { label: string; prompt: string }[] {
+  if (!turn?.answer) {
+    return [
+      { label: "Search DGMS regulations", prompt: "Find the applicable DGMS regulations for this hazard." },
+      { label: "Review prevention checks", prompt: "What prevention checks should the responsible officer complete?" },
+      { label: "Compare similar cases", prompt: "Show closely related SANKET cases and explain the differences." },
+    ];
+  }
+  const context = `${turn.question} ${turn.answer.title} ${turn.answer.lead}`.toLowerCase();
+  if (/slope|highwall|bench|strata|roof/.test(context)) {
+    return [
+      { label: "DGMS slope monitoring circulars", prompt: "Which DGMS circulars address slope and ground monitoring for this issue?" },
+      { label: "Bench height calculation steps", prompt: "What site data and steps are needed to verify safe bench height?" },
+      { label: "Inclinometer trigger levels", prompt: "What movement indicators and trigger levels should the mine verify?" },
+    ];
+  }
+  if (/fire|heating|combustion|burning|smoke/.test(context)) {
+    return [
+      { label: "Early warning indicators", prompt: "What early warning indicators should the mine monitor for this fire risk?" },
+      { label: "Fire control inspection list", prompt: "Create a concise inspection list for the controls discussed." },
+      { label: "Relevant DGMS circulars", prompt: "Which DGMS circulars and statutory clauses are relevant to this fire scenario?" },
+    ];
+  }
+  if (/haul|dumper|vehicle|locomotive|conveyor|machin/.test(context)) {
+    return [
+      { label: "Pre-start equipment checks", prompt: "What pre-start checks should the equipment supervisor document?" },
+      { label: "Traffic separation controls", prompt: "How should vehicle and pedestrian movements be separated at this mine?" },
+      { label: "Applicable statutory duties", prompt: "Which statutory duties and DGMS guidance apply to this equipment risk?" },
+    ];
+  }
+  return [
+    { label: "Applicable statutory clauses", prompt: "Which statutory clauses apply most directly to this issue?" },
+    { label: "Officer verification checklist", prompt: "Turn the answer into a short checklist for the responsible mine officer." },
+    { label: "Closest matching cases", prompt: "Find the closest matching historical SANKET cases for this issue." },
+  ];
+}
+
 export default function Home() {
   const [view, setView] = useState<View>("chat");
   const [question, setQuestion] = useState("");
@@ -140,6 +177,7 @@ export default function Home() {
   const sourceRequest = useRef<AbortController | null>(null);
   const activeSources =
     (view === "brief" ? briefTurn : turns.at(-1))?.answer?.sources || [];
+  const latestAnsweredTurn = [...turns].reverse().find((turn) => turn.answer);
   const closeMenu = useCallback(() => setMenuOpen(false), []);
   const closeProfile = useCallback(() => setProfileOpen(false), []);
   const closeSource = useCallback(() => {
@@ -534,6 +572,7 @@ export default function Home() {
                 <ChatInput
                   value={question}
                   busy={busy}
+                  suggestions={suggestionsForTurn(latestAnsweredTurn)}
                   inputRef={input}
                   onChange={setQuestion}
                   onSubmit={() => ask(question)}

@@ -1910,7 +1910,10 @@ h1 span {
     box-shadow: 0 2px 5px #1822300a;
   }
   .sidebar-nav-groups {
-    display: grid;
+    display: flex;
+    min-height: 0;
+    flex: 1;
+    flex-direction: column;
     gap: 22px;
   }
   .sidebar-nav-group {
@@ -1939,8 +1942,9 @@ h1 span {
     box-shadow: inset 3px 0 #3a8069;
   }
   .sidebar-settings {
+    margin-top: auto;
     border-top: 1px solid #e3e6eb;
-    padding-top: 18px;
+    padding-top: 24px;
   }
   .sidebar-settings-button {
     display: flex;
