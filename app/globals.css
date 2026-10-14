@@ -3889,3 +3889,103 @@ body {
     opacity: 0;
   }
 }
+
+/* Complete dark palette: shared tokens and explicit legacy component surfaces. */
+[data-theme="dark"] {
+  color-scheme: dark;
+  --paper: #111a16;
+  --workspace-bg: #111a16;
+  --white: #1b2922;
+  --surface: #1b2922;
+  --ink: #e1eee5;
+  --muted: #a3b6aa;
+  --line: #34483c;
+  --green: #9ed1b1;
+  --light: #25382c;
+  --dark-text: #e1eee5;
+  --dark-muted: #a3b6aa;
+}
+[data-theme="dark"] .composer-wrap {
+  background: linear-gradient(0deg, #111a16 84%, #111a1600);
+}
+[data-theme="dark"] :is(.actions, .verification-callout, .enterprise-answer .actions, .enterprise-answer .verification-callout) {
+  background: #1b2c22;
+  border-color: #38513f;
+}
+[data-theme="dark"] .enterprise-answer .action-row {
+  background: #253027;
+  border-color: #4d4c35;
+  border-left-color: #c59b42;
+}
+[data-theme="dark"] :is(.enterprise-answer h3, .actions h3, .verification-callout h3, .panel-heading, .source-book strong, .evidence-empty h3, .field-note h3, .brand, .brand-wordmark, .page-heading h1, .page-heading h2, .book-details h3, .case-card h3, .modal h2, .source-drawer h2) {
+  color: var(--dark-text);
+}
+[data-theme="dark"] :is(.enterprise-answer .action-row p, .verification-callout label, .user-message > p, .prompt-card p, .evidence-card p, .original-passage, .book-details p, .case-card p, .method-block p, .technical-details, .modal label) {
+  color: #c4d3c9;
+}
+[data-theme="dark"] :is(.role-badge, .citations button, .source-badges span, .evidence-orbit, .evidence-orbit > span, .prompt-icon, .modal-icon, .avatar, .nav-count, .panel-heading > span, .topic-row button) {
+  background: #2b4032;
+  color: #b9d8c3;
+  border-color: #405d49;
+}
+[data-theme="dark"] :is(.brand small, .tiny-label, .nav-label, .panel-kicker, .source-book small, .evidence-empty p, .field-note p, .evidence-footer, .prompt-card small, .topic-row > span, .answer-notice, .answer-tools, .drawer-meta, .small-text, .muted, .extraction-note, .welcome-stats, .suggested-heading, .composer-caption, .case-card small, .book-details small) {
+  color: var(--dark-muted);
+}
+[data-theme="dark"] :is(.source-drawer, .modal, .book-card, .case-card, .evidence-card, .method-block, .technical-details, .inquiry-summary, .brief-steps, .brief-card, .empty-state, .user-message, .thinking) {
+  background: #1b2922;
+  border-color: #344b3d;
+  color: var(--dark-text);
+}
+[data-theme="dark"] :is(.evidence-card:hover, .case-card:hover, .source-book:hover, .prompt-card:hover) {
+  background: #25392c;
+  border-color: #53755e;
+}
+[data-theme="dark"] :is(.field-note, .mine-context, .sidebar-settings, .status-card-divider, .answer-tools, .finding, .drawer-top, .modal-top, .book-details, .method-flow > div) {
+  border-color: #344b3d;
+}
+[data-theme="dark"] :is(.field-note button, .text-button, .outline-button, .prompt-card strong, .prompt-card small, .welcome h1 em, .welcome h1 span) {
+  color: #a8d2b7;
+}
+[data-theme="dark"] :is(.modal input, .modal select, .modal textarea, .library-search, .search-box, .filter-bar select, .filters select) {
+  color: #e1eee5;
+  background: #132019;
+  border-color: #405947;
+}
+[data-theme="dark"] :is(input, textarea)::placeholder { color: #94a79a; }
+[data-theme="dark"] .statutory-badge {
+  color: #e3c77c;
+  background: #3c3421;
+}
+[data-theme="dark"] .enterprise-sidebar .new-chat {
+  background: #294a37;
+  color: #e1eee5;
+  border-color: #527960;
+}
+[data-theme="dark"] .enterprise-sidebar .new-chat:hover { background: #365d44; }
+[data-theme="dark"] .composer-wrap .send-button:disabled {
+  background: #2b3a30;
+  color: #879c8b;
+}
+[data-theme="dark"] .error-note {
+  color: #edc3b4;
+  background: #3c2722;
+  border-color: #71483b;
+}
+[data-theme="dark"] .emergency {
+  background: #342722;
+  border-color: #a17145;
+}
+[data-theme="dark"] .toast { background: #2c4635; color: #e1eee5; }
+[data-theme="dark"] :is(.page-content h1, .case-card h2, .book-details h2, .method-flow h3, .brief-context h2, .brief-steps strong, .source-drawer h3) { color: #e1eee5; }
+[data-theme="dark"] .page-content h1 span { color: #a8d2b7; }
+[data-theme="dark"] :is(.page-intro, .case-event, .case-location, .case-meta, .book-details > div, .method-flow p) { color: #b3c5b8; }
+[data-theme="dark"] :is(.outline-button, .book-details .outline-button, .case-actions button, .method-flow > div > span, .case-category, .case-toolbar, .brief-context, .brief-steps > div) {
+  background: #253b2d;
+  border-color: #405c48;
+  color: #c6e2cf;
+}
+[data-theme="dark"] :is(.case-toolbar input, .case-toolbar select, .case-search, .search-field, .case-search input) {
+  background: #16251c;
+  border-color: #405c48;
+  color: #e1eee5;
+}
