@@ -118,7 +118,7 @@ export default function Home() {
   const [view, setView] = useState<View>("chat");
   const [question, setQuestion] = useState("");
   const conversation = useConversation();
-  const { turns, briefTurn, busy } = conversation;
+  const { turns, briefTurn, busy, online, status } = conversation;
   const [profile, setProfile] = useState<MineProfile>(initialProfile);
   const [profileOpen, setProfileOpen] = useState(false);
   const [profileDraft, setProfileDraft] = useState(initialProfile);
@@ -415,6 +415,10 @@ export default function Home() {
           <Contours />
         </div>
         <div className="sidebar-bottom">
+          <div className="sidebar-note">
+            <span className="tiny-label">{online ? "ONLINE" : "OFFLINE MODE"}</span>
+            <span>{online ? status : "Queries are saved on this device."}</span>
+          </div>
           <button className="mine-context" onClick={editProfile}>
             <span className="avatar">
               <HardHat size={20} />

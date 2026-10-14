@@ -24,6 +24,7 @@ const schema = z.object({
 }).strict();
 
 const json = (body: unknown, status = 200) => Response.json(body, { status, headers: responseHeaders });
+const event = (type: string, data: unknown) => `event: ${type}\ndata: ${JSON.stringify(data)}\n\n`;
 
 export async function POST(request: Request) {
   try {
@@ -67,7 +68,27 @@ export async function POST(request: Request) {
     }
     if (!key) return json({ ...fallback, notice: 'The AI answer service has no API key configured. Only matching book evidence is available.' });
     try {
-      return json(await synthesize({ question, sources, profile, key, model, history, briefing, signal: request.signal }));
+      const input = { question, sources, profile, key, model, history, briefing, signal: request.signal };
+      if (request.headers.get("accept")?.includes("text/event-stream")) {
+        const stream = new ReadableStream({
+          async start(controller) {
+            const encoder = new TextEncoder();
+            controller.enqueue(encoder.encode(event("status", { message: "Synthesizing safety guidance..." })));
+            try {
+              const answer = await synthesize(input);
+              controller.enqueue(encoder.encode(event("answer", answer)));
+            } catch (error) {
+              const message = error instanceof Error ? error.message : "The answer service could not be reached.";
+              controller.enqueue(encoder.encode(event("error", { message })));
+            } finally {
+              controller.close();
+            }
+          },
+          cancel() { request.signal.throwIfAborted(); },
+        });
+        return new Response(stream, { headers: { ...responseHeaders, "Content-Type": "text/event-stream", "Cache-Control": "no-cache, no-transform", Connection: "keep-alive" } });
+      }
+      return json(await synthesize(input));
     } catch (error) {
       if (request.signal.aborted) return json({ error: 'Request stopped.' }, 499);
       // Never forward a provider error body or exception message to the browser.

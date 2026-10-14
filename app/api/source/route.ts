@@ -17,5 +17,5 @@ export async function GET(request: Request) {
   if (question.length > 1800 || !['all', 'coal', 'noncoal'].includes(sector)) {
     return Response.json({ error: 'Use a shorter query and a valid mine sector.' }, { status: 400, headers: responseHeaders });
   }
-  return Response.json({ sources: question.trim() ? retrieveHybrid(question, sector, 6) : [] }, { headers: responseHeaders });
+  return Response.json({ sources: question.trim() ? retrieveHybrid(question, sector as 'all' | 'coal' | 'noncoal', 6) : [] }, { headers: responseHeaders });
 }

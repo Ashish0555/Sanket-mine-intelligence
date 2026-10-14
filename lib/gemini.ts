@@ -126,11 +126,7 @@ export async function synthesize({ question, sources, profile, key, model, histo
     recentConversation: history.slice(-6),
     evidence,
   });
-  const timeout = AbortSignal.timeout(35_000);
-  const response = await fetch(`${HOST}models/${model}:generateContent`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', 'x-goog-api-key': key },
-    body: JSON.stringify({
+  const body = JSON.stringify({
       systemInstruction: { parts: [{ text: SYSTEM_INSTRUCTION }] },
       contents: [{ role: 'user', parts: [{ text: prompt }] }],
       generationConfig: { temperature: 0.15, maxOutputTokens: 10000, responseMimeType: 'application/json', responseSchema: {
@@ -141,9 +137,30 @@ export async function synthesize({ question, sources, profile, key, model, histo
           actions: responseSchema.properties.actions,
         },
       } },
-    }),
-    signal: signal ? AbortSignal.any([signal, timeout]) : timeout,
-  });
+    });
+  const fallbackModel = process.env.GEMINI_FALLBACK_MODEL?.trim();
+  const models = [...new Set([model, fallbackModel].filter((value): value is string => !!value && validModel(value)))];
+  let response: Response | null = null;
+  for (const candidateModel of models) {
+    for (let attempt = 0; attempt < 3; attempt++) {
+      const timeout = AbortSignal.timeout(8_000);
+      try {
+        response = await fetch(`${HOST}models/${candidateModel}:generateContent`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'x-goog-api-key': key },
+          body,
+          signal: signal ? AbortSignal.any([signal, timeout]) : timeout,
+        });
+      } catch (error) {
+        if (signal?.aborted) throw error;
+        if (attempt === 2) continue;
+      }
+      if (response?.ok || (response && response.status < 500 && response.status !== 429)) break;
+      if (attempt < 2) await new Promise(resolve => setTimeout(resolve, 1500 * (attempt + 1)));
+    }
+    if (response?.ok) break;
+  }
+  if (!response) throw new Error('The answer service is temporarily unavailable. Showing the retrieved book evidence instead.');
   if (!response.ok) throw new Error(friendlyError(response.status));
   const data = await response.json() as {
     candidates?: { content?: { parts?: { text?: string; thought?: boolean }[] }; finishReason?: string }[];

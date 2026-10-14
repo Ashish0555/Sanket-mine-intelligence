@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import type { MineProfile } from "../../lib/knowledge";
 import { conversationHistory, isAnswer, type Turn } from "./conversation";
+import { deleteAllTurns, loadTurns, saveTurn } from "../../lib/storage/offline-db";
 
 type Pending = { controller: AbortController; turn: Turn };
 
@@ -8,6 +9,8 @@ export function useConversation() {
   const [turns, setTurns] = useState<Turn[]>([]);
   const [briefTurn, setBriefTurn] = useState<Turn | null>(null);
   const [busy, setBusy] = useState(false);
+  const [status, setStatus] = useState("Ready");
+  const [online, setOnline] = useState(true);
   const pending = useRef<Pending | null>(null);
 
   useEffect(
@@ -18,8 +21,32 @@ export function useConversation() {
     },
     [],
   );
+  useEffect(() => {
+    setOnline(navigator.onLine);
+    const onlineHandler = () => setOnline(true);
+    const offlineHandler = () => setOnline(false);
+    window.addEventListener("online", onlineHandler);
+    window.addEventListener("offline", offlineHandler);
+    void loadTurns().then((saved) => {
+      if (saved.length) setTurns(saved);
+    }).catch(() => undefined);
+    return () => {
+      window.removeEventListener("online", onlineHandler);
+      window.removeEventListener("offline", offlineHandler);
+    };
+  }, []);
+  useEffect(() => {
+    if (!online || pending.current) return;
+    const queued = turns.find((turn) => turn.error?.startsWith("Offline."));
+    if (queued) {
+      const retryTurn = { ...queued, error: undefined };
+      updateTurn(retryTurn);
+      void run(retryTurn);
+    }
+  }, [online, turns]);
 
   function updateTurn(turn: Turn) {
+    void saveTurn(turn).catch(() => undefined);
     if (turn.briefing) setBriefTurn(turn);
     else
       setTurns((previous) =>
@@ -32,15 +59,23 @@ export function useConversation() {
     const request = { controller: new AbortController(), turn };
     pending.current = request;
     setBusy(true);
+    setStatus(online ? "Retrieving DGMS case records..." : "Offline: saved locally; waiting to sync...");
+    if (!online) {
+      updateTurn({ ...turn, error: "Offline. This query is saved and will retry when the connection returns." });
+      setBusy(false);
+      pending.current = null;
+      return;
+    }
     let timedOut = false;
     const timeout = setTimeout(() => {
       timedOut = true;
       request.controller.abort();
     }, 65000);
     try {
+      setStatus("Retrieving DGMS case records...");
       const response = await fetch("/api/chat", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json", Accept: "text/event-stream" },
         body: JSON.stringify({
           question: turn.question,
           profile: turn.profile,
@@ -49,7 +84,28 @@ export function useConversation() {
         }),
         signal: request.controller.signal,
       });
-      const data: unknown = await response.json().catch(() => null);
+      setStatus("Synthesizing safety guidance...");
+      let data: unknown = null;
+      if (response.headers.get("content-type")?.includes("text/event-stream") && response.body) {
+        const reader = response.body.getReader();
+        const decoder = new TextDecoder();
+        let buffer = "";
+        while (true) {
+          const chunk = await reader.read();
+          if (chunk.done) break;
+          buffer += decoder.decode(chunk.value, { stream: true });
+          for (const block of buffer.split("\n\n").slice(0, -1)) {
+            const type = block.match(/^event:\s*(.+)$/m)?.[1];
+            const payload = block.match(/^data:\s*(.+)$/m)?.[1];
+            if (!payload) continue;
+            const parsed = JSON.parse(payload) as { message?: string };
+            if (type === "status" && parsed.message) setStatus(parsed.message);
+            if (type === "answer") data = parsed;
+            if (type === "error") throw new Error(parsed.message || "The answer service could not be reached.");
+          }
+          buffer = buffer.split("\n\n").at(-1) || "";
+        }
+      } else data = await response.json().catch(() => null);
       if (!response.ok) {
         const message =
           data &&
@@ -78,6 +134,7 @@ export function useConversation() {
       if (pending.current === request) {
         pending.current = null;
         setBusy(false);
+        setStatus("Ready");
       }
     }
   }
@@ -123,8 +180,9 @@ export function useConversation() {
   function clear() {
     if (pending.current) return false;
     setTurns([]);
+    void deleteAllTurns().catch(() => undefined);
     return true;
   }
 
-  return { turns, briefTurn, busy, submit, retry, stop, clear };
+  return { turns, briefTurn, busy, online, status, submit, retry, stop, clear };
 }
