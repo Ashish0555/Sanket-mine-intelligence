@@ -61,6 +61,23 @@ try {
       }
     }
   });
+  await check('contextual follow-ups survive API validation and follow the latest turn', async () => {
+    const { suggestionsForTurn } = loadTypeScript('app/ui/suggestions.ts');
+    const suggestions = [
+      { label: 'Confirm visitor PPE', prompt: 'What PPE should I confirm with my escort before a mine visit?' },
+      { label: 'Understand the induction', prompt: 'What should a mine visitor learn during induction?' },
+      { label: 'Plan emergency communication', prompt: 'How should a visitor confirm emergency communication arrangements?' },
+    ];
+    globalThis.fetch = async () => response({ ...payload, suggestions });
+    const answer = await synthesize(args);
+    assert.deepEqual(answer.suggestions, suggestions);
+    assert.deepEqual(suggestionsForTurn({ question: 'Mine visit', answer }), suggestions);
+    const old = { ...answer, suggestions: undefined, questions: [] };
+    assert.notDeepEqual(suggestionsForTurn({ question: 'Inspect a conveyor', answer: { ...old, title: 'Conveyor inspection' } }),
+      suggestionsForTurn({ question: 'Roof support', answer: { ...old, title: 'Roof support' } }));
+    globalThis.fetch = async () => response({ ...payload, suggestions: [{ label: 42, prompt: null }] });
+    assert.deepEqual((await synthesize(args)).suggestions, []);
+  });
   for (const [status, message] of [[429, /usage limit/], [403, /configured correctly/], [404, /unavailable/], [503, /unavailable/]]) {
     await check(`provider status ${status}`, async () => {
       globalThis.fetch = async () => new Response('', { status });

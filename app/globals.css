@@ -3145,3 +3145,223 @@ h1 span {
     width: 100%;
   }
 }
+
+/* Keep sidebar utilities anchored and consistently styled at every width. */
+.enterprise-sidebar .sidebar-nav-groups {
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+  flex: 1 0 auto;
+}
+.enterprise-sidebar .sidebar-lower {
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+  gap: 14px;
+  margin-top: auto;
+  padding-top: 28px;
+}
+.enterprise-sidebar .sidebar-settings {
+  border-top: 1px solid var(--line, #dce3d8);
+  padding-top: 16px;
+}
+.enterprise-sidebar .sidebar-settings .nav-label {
+  margin: 0 0 8px;
+  font-size: 10px;
+  font-weight: 400;
+  letter-spacing: 1.4px;
+}
+.enterprise-sidebar .sidebar-settings-button {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 8px 0;
+  font-size: 13px;
+  font-weight: 400;
+  text-align: left;
+}
+.enterprise-sidebar .sidebar-status-card {
+  margin: 0;
+  padding: 14px;
+  border: 1px solid #dce3d8;
+  border-radius: 12px;
+  background: #ffffff60;
+  box-shadow: none;
+}
+.enterprise-sidebar .status-card-heading {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+  color: #7e8b80;
+  font-size: 9px;
+  font-weight: 400;
+  letter-spacing: 1.3px;
+}
+.enterprise-sidebar .status-card-heading svg { margin-left: auto; }
+.enterprise-sidebar .sidebar-status-card strong,
+.enterprise-sidebar .sidebar-status-card > span {
+  display: block;
+  margin: 4px 0 0;
+  font-size: 11px;
+  line-height: 1.6;
+  font-weight: 400;
+  overflow-wrap: normal;
+}
+.enterprise-sidebar .status-card-divider {
+  margin: 12px 0;
+  border-top: 1px solid #dce3d8;
+}
+.enterprise-sidebar .sidebar-status-card small {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 10px;
+  font-weight: 400;
+  line-height: 1.5;
+}
+.enterprise-sidebar .mine-context {
+  padding: 12px 0 0;
+}
+.enterprise-sidebar .mine-context strong {
+  font-weight: 400;
+  font-size: 12px;
+}
+.enterprise-sidebar .sidebar-bottom-controls {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 0;
+  padding-top: 12px;
+  border-top: 1px solid #dce3d8;
+}
+.enterprise-sidebar .sidebar-bottom-controls > button {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 0;
+  font-size: 12px;
+  font-weight: 400;
+}
+.enterprise-sidebar .sidebar-avatar {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  margin-left: auto;
+  border-radius: 50%;
+  background: #e1e7dc;
+  color: #6d8067;
+  font-size: 11px;
+  font-weight: 400;
+}
+.fixed-viewport-sidebar { overflow-y: auto; }
+[data-theme="dark"] .enterprise-sidebar .sidebar-status-card {
+  background: #ffffff06;
+  border-color: #35433d;
+}
+@media (min-width: 761px) {
+  .enterprise-sidebar.is-collapsed .sidebar-lower { align-items: center; }
+}
+.enterprise-sidebar .sidebar-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.enterprise-sidebar .sidebar-header .brand-home { margin: 0 auto 0 0; }
+.enterprise-sidebar .sidebar-collapse {
+  display: grid;
+  place-items: center;
+  width: 26px;
+  height: 30px;
+  flex-shrink: 0;
+  color: #86917e;
+}
+.enterprise-sidebar .new-chat { margin: 24px 0; }
+.enterprise-sidebar .sidebar-nav-groups {
+  flex: 1 0 auto;
+  gap: 18px;
+}
+.enterprise-sidebar .sidebar-lower { padding-top: 20px; }
+
+/* Compact conversation dock, with contextual follow-ups above the input. */
+.composer-wrap .quick-action-row {
+  gap: 8px;
+  margin-bottom: 12px;
+}
+.composer-wrap .quick-action-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 34px;
+  padding: 7px 12px;
+  border: 1px solid #dfe6df;
+  background: #ffffffb3;
+  color: #53645a;
+  font-size: 11px;
+  font-weight: 400;
+  box-shadow: 0 1px 3px #203c2d04;
+}
+.composer-wrap .quick-action-pill:hover:not(:disabled) {
+  background: #edf3ef;
+  border-color: #b9cebf;
+  color: #254c39;
+  transform: translateY(-1px);
+}
+.composer-wrap .quick-action-pill > span:first-child { font-size: inherit; }
+.composer-wrap .quick-action-pill svg { flex-shrink: 0; opacity: .6; }
+.composer-wrap .floating-composer {
+  border: 1px solid #dce5dd;
+  border-radius: 22px;
+  padding: 16px 18px 12px;
+  background: #fff;
+  box-shadow: 0 8px 30px #233c2e0a, 0 2px 6px #233c2e04;
+  transition: border-color .2s, box-shadow .2s;
+}
+.composer-wrap .floating-composer:focus-within {
+  border-color: #8fb49b;
+  box-shadow: 0 0 0 3px #7fa78d14, 0 8px 30px #233c2e0a;
+}
+.composer-wrap .floating-composer textarea {
+  min-height: 52px;
+  height: 52px;
+  max-height: 160px;
+  padding: 0;
+  font-size: 14px;
+  line-height: 1.6;
+  color: #283e33;
+}
+.composer-wrap .floating-composer textarea::placeholder { color: #94a198; }
+.composer-wrap .composer-bottom { margin-top: 8px; }
+.composer-wrap .source-pill {
+  padding: 7px 10px;
+  border: 1px solid #e9eee9;
+  border-radius: 10px;
+  background: #f6f8f5;
+  color: #728372;
+  font-size: 10px;
+}
+.composer-wrap .composer-right > span { font-size: 10px; color: #9aa69d; }
+.composer-wrap .send-button {
+  width: 36px;
+  height: 36px;
+  border-radius: 12px;
+  background: #2d5845;
+  color: white;
+  transition: background .2s, transform .2s;
+}
+.composer-wrap .send-button:hover:not(:disabled) { background: #214534; transform: translateY(-1px); }
+.composer-wrap .send-button:disabled { background: #eef2ed; color: #a4b2a3; }
+.composer-wrap .composer-caption { margin-top: 9px; font-size: 9px; color: #939e95; }
+[data-theme="dark"] .composer-wrap .floating-composer { background: #1e2a25; border-color: #3b4b42; }
+[data-theme="dark"] .composer-wrap .floating-composer textarea { color: #e0e9e2; }
+[data-theme="dark"] .composer-wrap .quick-action-pill,
+[data-theme="dark"] .composer-wrap .source-pill { background: #24332b; border-color: #3b4b42; color: #c2d1c5; }
+@media (max-width: 760px) {
+  .composer-wrap .quick-action-row { flex-wrap: nowrap; overflow-x: auto; }
+  .composer-wrap .quick-action-pill { max-width: 260px; }
+  .composer-wrap .quick-action-pill span { overflow: hidden; text-overflow: ellipsis; }
+  .composer-wrap .floating-composer { padding: 14px 14px 10px; border-radius: 18px; }
+  .composer-wrap .composer-right > span { display: none; }
+}

@@ -15,6 +15,7 @@ Use the JSON fields in this order of importance:
 Historical cases are a bonus, never a prerequisite for answering. With no supplied evidence, provide the complete general answer, use empty citations arrays for general actions, and leave findings empty. Never invent source IDs.
 4. findings: supporting SANKET evidence and similar historical cases, displayed at the end. Select genuinely relevant cases, explain what happened, what the inquiry found, how it relates to the question and any important differences. Every item must cite supplied source IDs. Do not invent incidents, dates, findings, quotations or citations. If no case is genuinely similar, leave findings empty and briefly say that no close match was supplied; do not force a match.
 Never treat case-specific dimensions, distances, gas readings or rules as universal safe limits. These historical books cannot establish current regulations or current incident status. Never infer a mine is safe, predict a fire probability, or rank sector risk from accident counts without exposure data. Distinguish an ignition cause from factors that exposed people or worsened harm. Never attribute a causal effect to a similarity score. Adapt to known coal/non-coal and opencast/underground/oil context without inventing mine-specific hazards. Do not give unsupervised firefighting, ventilation adjustment, sealing or re-entry instructions; these require an authorized site assessment.
+5. suggestions: generate exactly 3 distinct next questions based on this latest user question and your answer. Each has a short label (<=65 characters) and a self-contained prompt (<=350 characters). Focus on useful unresolved details or natural next steps. Do not repeat questions already answered in the conversation, reuse a fixed topic menu, or suggest unrelated statutory limits. Match the conversation language.
 Use the required JSON schema without Markdown code fences. Title <=90 characters. Lead <=12000 characters. Up to 12 findings and 12 actions, each <=1800 characters. Up to 3 questions, each <=240 characters. Use only supplied source IDs in citations arrays. Be thorough when useful, without padding or a long disclaimer. Do not include unnecessary sentences or words. Remove filler, repeated points, generic introductions and closing summaries that add no value. Include only information that directly helps answer the question; keep necessary explanations complete.`;
 
 const findingSchema = {
@@ -33,8 +34,14 @@ const responseSchema = {
     findings: { type: 'ARRAY', items: findingSchema },
     actions: { type: 'ARRAY', items: findingSchema },
     questions: { type: 'ARRAY', items: { type: 'STRING' } },
+    suggestions: {
+      type: 'ARRAY', minItems: 3, maxItems: 3,
+      items: { type: 'OBJECT', properties: {
+        label: { type: 'STRING' }, prompt: { type: 'STRING' },
+      }, required: ['label', 'prompt'] },
+    },
   },
-  required: ['title', 'lead', 'findings', 'actions', 'questions'],
+  required: ['title', 'lead', 'findings', 'actions', 'questions', 'suggestions'],
 };
 
 export function validModel(value: string) {
@@ -88,6 +95,13 @@ function validateAnswer(value: unknown, sources: Source[]): Answer {
     findings,
     actions,
     questions: (value.questions as string[]).map(question => question.trim()),
+    suggestions: Array.isArray(value.suggestions)
+      ? value.suggestions.filter((item): item is { label: string; prompt: string } =>
+          record(item) && shortText(item.label, 65) && shortText(item.prompt, 350))
+          .map(item => ({ label: item.label.trim(), prompt: item.prompt.trim() }))
+          .filter((item, index, all) => all.findIndex(other => other.prompt.toLowerCase() === item.prompt.toLowerCase()) === index)
+          .slice(0, 3)
+      : [],
     sources: sources.filter(source => cited.has(source.id)),
     mode: 'synthesis',
     notice: cited.size

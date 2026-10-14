@@ -196,6 +196,7 @@ export type Answer = {
     findings: Finding[];
     actions: Finding[];
     questions: string[];
+    suggestions?: { label: string; prompt: string }[];
     sources: Source[];
     mode: string;
     notice?: string;

@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowUp, BookOpen, ChevronDown } from "lucide-react";
+import { ArrowUp, ArrowUpRight, BookOpen, ChevronDown } from "lucide-react";
 import type { RefObject } from "react";
 
 export function ChatInput({
@@ -36,6 +36,7 @@ export function ChatInput({
             onClick={() => onQuickAction(item.prompt)}
           >
             <span>{item.label}</span>
+            <ArrowUpRight size={13} aria-hidden="true" />
           </button>
         ))}
       </div>
@@ -51,7 +52,7 @@ export function ChatInput({
           value={value}
           onChange={(event) => onChange(event.target.value)}
           maxLength={1800}
-          placeholder="Ask about mining hazards, past incidents, or prevention…"
+          placeholder="Ask a question or explore a follow-up…"
           aria-label="Ask SANKET"
           rows={2}
           onKeyDown={(event) => {
@@ -72,7 +73,7 @@ export function ChatInput({
             onClick={onOpenBooks}
           >
             <BookOpen size={14} />
-            SANKET · Coal + Non-coal
+            SANKET sources
             <ChevronDown size={11} />
           </button>
           <div className="composer-right">
