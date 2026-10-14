@@ -1872,6 +1872,357 @@ h1 span {
     transition: transform 0.25s;
     width: 236px;
   }
+
+  /* Enterprise workspace surfaces */
+  .enterprise-sidebar {
+    width: 252px;
+    flex-basis: 252px;
+    padding: 22px 14px 16px;
+    background: #f7f8fa;
+    border-right-color: #e4e7ec;
+  }
+  .sidebar-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 0 8px;
+  }
+  .sidebar-header .brand-home {
+    margin: 0 auto 0 0;
+  }
+  .sidebar-collapse {
+    display: grid;
+    place-items: center;
+    width: 30px;
+    height: 30px;
+    border: 1px solid #e1e5eb;
+    border-radius: 8px;
+    color: #697586;
+  }
+  .sidebar-collapse:hover {
+    background: #edf0f4;
+    color: #233b39;
+  }
+  .enterprise-sidebar .new-chat {
+    margin: 25px 4px 26px;
+    width: calc(100% - 8px);
+    border-color: #d9dee7;
+    box-shadow: 0 2px 5px #1822300a;
+  }
+  .sidebar-nav-groups {
+    display: grid;
+    gap: 22px;
+  }
+  .sidebar-nav-group {
+    display: grid;
+    gap: 8px;
+  }
+  .sidebar-nav-group .nav-label {
+    margin: 0;
+    padding: 0 12px;
+    color: #98a1ae;
+    letter-spacing: 1.35px;
+  }
+  .enterprise-sidebar nav {
+    gap: 3px;
+  }
+  .enterprise-sidebar nav button,
+  .sidebar-settings-button {
+    min-height: 40px;
+    padding: 10px 12px;
+    color: #687385;
+    border-radius: 9px;
+  }
+  .enterprise-sidebar nav button.selected {
+    color: #1f4e43;
+    background: #e4eee8;
+    box-shadow: inset 3px 0 #3a8069;
+  }
+  .sidebar-settings {
+    border-top: 1px solid #e3e6eb;
+    padding-top: 18px;
+  }
+  .sidebar-settings-button {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    width: 100%;
+    text-align: left;
+  }
+  .sidebar-status-card {
+    margin: auto 4px 18px;
+    padding: 14px;
+    background: #fff;
+    border: 1px solid #e1e5eb;
+    border-radius: 12px;
+    box-shadow: 0 5px 18px #18223008;
+  }
+  .status-card-heading {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    color: #8a94a3;
+    font-size: 9px;
+    letter-spacing: 1.1px;
+    font-weight: 750;
+  }
+  .status-card-heading svg {
+    margin-left: auto;
+    color: #3e8c6d;
+  }
+  .status-pulse {
+    width: 7px;
+    height: 7px;
+    background: #43a477;
+    border-radius: 50%;
+    box-shadow: 0 0 0 3px #43a4771c;
+  }
+  .sidebar-status-card strong,
+  .sidebar-status-card > span {
+    display: block;
+    margin-top: 12px;
+    color: #303a49;
+    font-size: 11px;
+    font-weight: 700;
+  }
+  .sidebar-status-card > span {
+    margin-top: 5px;
+    color: #7c8796;
+    font-weight: 500;
+    font-size: 10px;
+  }
+  .status-card-divider {
+    margin: 13px 0 10px;
+    border-top: 1px solid #edf0f3;
+  }
+  .sidebar-status-card small {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    color: #8791a0;
+    font-size: 10px;
+  }
+  .status-dot.offline {
+    background: #d09249;
+  }
+  .enterprise-sidebar .mine-context {
+    border-top-color: #e3e6eb;
+    padding: 14px 4px 0;
+  }
+  .enterprise-sidebar.is-collapsed {
+    width: 76px;
+    flex-basis: 76px;
+    padding-left: 10px;
+    padding-right: 10px;
+  }
+  .enterprise-sidebar.is-collapsed .brand small,
+  .enterprise-sidebar.is-collapsed .new-chat span,
+  .enterprise-sidebar.is-collapsed .sidebar-nav-group .nav-label,
+  .enterprise-sidebar.is-collapsed nav button span:not(.nav-dot),
+  .enterprise-sidebar.is-collapsed .sidebar-settings-button span,
+  .enterprise-sidebar.is-collapsed .sidebar-status-card,
+  .enterprise-sidebar.is-collapsed .mine-context > span:not(.avatar),
+  .enterprise-sidebar.is-collapsed .mine-context > svg {
+    display: none;
+  }
+  .enterprise-sidebar.is-collapsed .brand-home,
+  .enterprise-sidebar.is-collapsed .new-chat {
+    margin-left: auto;
+    margin-right: auto;
+  }
+  .enterprise-sidebar.is-collapsed nav button,
+  .enterprise-sidebar.is-collapsed .sidebar-settings-button {
+    justify-content: center;
+    padding-left: 0;
+    padding-right: 0;
+  }
+  .enterprise-sidebar.is-collapsed .new-chat {
+    width: 42px;
+    justify-content: center;
+  }
+  .enterprise-sidebar.is-collapsed .mine-context {
+    justify-content: center;
+  }
+  .enterprise-sidebar.is-collapsed + .workspace {
+    margin-left: 76px;
+    width: calc(100% - 76px);
+  }
+  .floating-composer {
+    max-width: 780px;
+    border-radius: 18px;
+    box-shadow: 0 12px 35px #18223014;
+    border-color: #dce1e8;
+    background: #fffffff2;
+    backdrop-filter: blur(12px);
+  }
+  .quick-action-row {
+    display: flex;
+    gap: 8px;
+    max-width: 780px;
+    margin: 0 auto 10px;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .quick-action-row::-webkit-scrollbar {
+    display: none;
+  }
+  .quick-action-pill {
+    white-space: nowrap;
+    padding: 7px 11px;
+    border: 1px solid #e0e4ea;
+    border-radius: 999px;
+    background: #fff;
+    color: #697586;
+    font-size: 10px;
+    font-weight: 650;
+  }
+  .quick-action-pill:hover {
+    border-color: #9dbdad;
+    color: #24594d;
+    background: #f4faf6;
+  }
+  .quick-action-pill span {
+    margin-right: 5px;
+  }
+  .enterprise-answer {
+    background: #fff;
+    border: 1px solid #e1e5eb;
+    border-radius: 14px;
+    padding: 24px;
+    box-shadow: 0 6px 22px #1822300a;
+  }
+  .answer-card-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 20px;
+  }
+  .answer-quick-tools {
+    display: flex;
+    gap: 5px;
+  }
+  .answer-quick-tools button {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 6px 8px;
+    border: 1px solid #e5e8ed;
+    border-radius: 7px;
+    color: #788394;
+    font-size: 10px;
+  }
+  .answer-quick-tools button:hover {
+    color: #24594d;
+    background: #f3f8f4;
+    border-color: #b7d2c2;
+  }
+  .enterprise-answer h2 {
+    color: #181d26;
+    font-size: 20px;
+    font-weight: 650;
+    letter-spacing: -0.4px;
+  }
+  .enterprise-answer .answer-lead,
+  .enterprise-answer .action-row p,
+  .enterprise-answer .finding p {
+    color: #4f5968;
+    font-size: 13px;
+    line-height: 1.75;
+  }
+  .action-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+  }
+  .enterprise-answer .action-row {
+    min-height: 150px;
+    padding: 15px 14px;
+    border: 0;
+    border-left: 4px solid #d8a53c;
+    border-radius: 0 10px 10px 0;
+    background: #fffbf1;
+  }
+  .enterprise-answer .action-number {
+    display: block;
+    margin-bottom: 12px;
+    color: #a87813;
+    font-size: 11px;
+    font-weight: 800;
+  }
+  .role-badge {
+    display: inline-block;
+    margin-top: 11px;
+    padding: 3px 8px;
+    border-radius: 999px;
+    background: #eef0f3;
+    color: #596474;
+    font-size: 10px;
+    font-weight: 650;
+  }
+  .verification-callout {
+    border: 1px solid #d8e3da;
+    border-radius: 11px;
+    background: #f4faf5;
+    padding: 16px;
+  }
+  .verification-callout h3 {
+    color: #285c49;
+  }
+  .verification-callout li {
+    padding: 8px 0;
+  }
+  .verification-callout label {
+    display: flex;
+    align-items: flex-start;
+    gap: 9px;
+    color: #4d6257;
+    font-size: 12px;
+    line-height: 1.5;
+  }
+  .verification-callout input {
+    width: 16px;
+    height: 16px;
+    margin-top: 1px;
+    accent-color: #3f8669;
+  }
+
+  @media (max-width: 760px) {
+    .enterprise-sidebar {
+      width: 274px;
+      flex-basis: 274px;
+    }
+    .enterprise-sidebar.is-collapsed {
+      width: 274px;
+      flex-basis: 274px;
+    }
+    .enterprise-sidebar.is-collapsed .brand small,
+    .enterprise-sidebar.is-collapsed .new-chat span,
+    .enterprise-sidebar.is-collapsed .sidebar-nav-group .nav-label,
+    .enterprise-sidebar.is-collapsed nav button span:not(.nav-dot),
+    .enterprise-sidebar.is-collapsed .sidebar-settings-button span,
+    .enterprise-sidebar.is-collapsed .sidebar-status-card,
+    .enterprise-sidebar.is-collapsed .mine-context > span:not(.avatar),
+    .enterprise-sidebar.is-collapsed .mine-context > svg {
+      display: initial;
+    }
+    .enterprise-sidebar.is-collapsed .sidebar-status-card {
+      display: block;
+    }
+    .enterprise-sidebar.is-collapsed .new-chat {
+      width: calc(100% - 8px);
+    }
+    .action-grid {
+      grid-template-columns: 1fr;
+    }
+    .answer-card-toolbar {
+      align-items: flex-start;
+      flex-direction: column;
+    }
+    .answer-quick-tools span {
+      display: none;
+    }
+  }
   .sidebar.is-open {
     transform: translateX(0);
   }

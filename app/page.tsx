@@ -2,7 +2,6 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import {
-  ArrowUp,
   ArrowUpRight,
   ArrowRight,
   BookOpen,
@@ -17,7 +16,6 @@ import {
   LoaderCircle,
   Menu,
   MessageSquare,
-  Plus,
   Search,
   Settings2,
   ShieldCheck,
@@ -27,9 +25,10 @@ import {
   HardHat,
 } from "lucide-react";
 import type { MineProfile, Source } from "../lib/knowledge";
-import { AnswerView } from "./ui/answer-view";
-import { Contours, Logo } from "./ui/brand";
-import { Dialog, useModalFocus } from "./ui/dialog";
+import { ChatInput } from "./components/chat-input";
+import { ChatMessage } from "./components/chat-message";
+import { Sidebar, type WorkspaceView } from "./components/sidebar";
+import { Dialog } from "./ui/dialog";
 import {
   answerText,
   initialProfile,
@@ -39,7 +38,7 @@ import {
 } from "./ui/conversation";
 import { useConversation } from "./ui/use-conversation";
 
-type View = "chat" | "brief" | "cases" | "books";
+type View = WorkspaceView;
 type Case = {
   id: string;
   title: string;
@@ -135,9 +134,9 @@ export default function Home() {
   const [caseSector, setCaseSector] = useState("all");
   const [limit, setLimit] = useState(24);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [toast, setToast] = useState("");
   const input = useRef<HTMLTextAreaElement>(null);
-  const sidebar = useRef<HTMLElement>(null);
   const sourceRequest = useRef<AbortController | null>(null);
   const activeSources =
     (view === "brief" ? briefTurn : turns.at(-1))?.answer?.sources || [];
@@ -151,7 +150,6 @@ export default function Home() {
     setSourceBusy(false);
     setSourceError("");
   }, []);
-  useModalFocus(sidebar, menuOpen, closeMenu);
 
   useEffect(() => {
     const controller = new AbortController();
@@ -326,6 +324,19 @@ export default function Home() {
       notify("Copy is unavailable. Use Download instead.");
     }
   }
+  async function share(turn: Turn) {
+    if (!turn.answer) return;
+    const text = answerText(turn.answer, turn.question, window.location.origin);
+    if (navigator.share) {
+      try {
+        await navigator.share({ title: "SANKET inquiry", text });
+        return;
+      } catch {
+        return;
+      }
+    }
+    await copy(turn);
+  }
   const shown = catalog.filter(
     (c) =>
       (!fireOnly || c.fire) &&
@@ -339,113 +350,31 @@ export default function Home() {
       {menuOpen && (
         <div className="mobile-scrim" onClick={() => setMenuOpen(false)} />
       )}
-      <aside
-        ref={sidebar}
-        id="workspace-navigation"
-        className={"sidebar " + (menuOpen ? "is-open" : "")}
-        role={menuOpen ? "dialog" : undefined}
-        aria-modal={menuOpen || undefined}
-        aria-label={menuOpen ? "Workspace navigation" : undefined}
-        tabIndex={-1}
-      >
-        <button
-          className="mobile-close icon-button"
-          aria-label="Close navigation"
-          onClick={closeMenu}
-        >
-          <X size={21} />
-        </button>
-        <a
-          className="brand-home"
-          href="#"
-          onClick={(e) => {
-            e.preventDefault();
-            changeView("chat");
-          }}
-          aria-label="SANKET home"
-        >
-          <Logo />
-        </a>
-        <button
-          className="new-chat"
-          disabled={busy}
-          onClick={() => {
-            if (!conversation.clear()) return;
-            setQuestion("");
-            changeView("chat");
-            requestAnimationFrame(() => input.current?.focus());
-          }}
-        >
-          <Plus size={17} />
-          New conversation
-        </button>
-        <p className="nav-label">WORKSPACE</p>
-        <nav aria-label="Main navigation">
-          {(
-            [
-              { id: "chat", icon: MessageSquare, label: "Ask SANKET" },
-              { id: "brief", icon: Compass, label: "Officer briefing" },
-              { id: "cases", icon: Layers3, label: "Case library" },
-              { id: "books", icon: BookOpen, label: "Knowledge base" },
-            ] as const
-          ).map(({ id, icon: Icon, label }) => (
-            <button
-              className={view === id ? "selected" : ""}
-              key={id}
-              aria-current={view === id ? "page" : undefined}
-              onClick={() => changeView(id)}
-            >
-              <Icon size={18} />
-              {label}
-              {id === "chat" && <span className="nav-dot" />}
-              {id === "cases" && (
-                <span className="nav-count">{manifest?.cases || "—"}</span>
-              )}
-            </button>
-          ))}
-        </nav>
-        <div className="sidebar-note">
-          <span className="tiny-label">BUILT ON REAL INQUIRIES</span>
-          <p>
-            Past incidents.
-            <br />
-            Practical lessons.
-          </p>
-          <span>Coal & non-coal · DGMS SANKET</span>
-          <Contours />
-        </div>
-        <div className="sidebar-bottom">
-          <div className="sidebar-note">
-            <span className="tiny-label">{online ? "ONLINE" : "OFFLINE MODE"}</span>
-            <span>{online ? status : "Queries are saved on this device."}</span>
-          </div>
-          <button className="mine-context" onClick={editProfile}>
-            <span className="avatar">
-              <HardHat size={20} />
-            </span>
-            <span>
-              <strong>{profile.name || "Your mine context"}</strong>
-              <small>
-                {profile.sector === "all"
-                  ? "Set mine type & conditions"
-                  : profile.sector === "coal"
-                    ? "Coal · " + profile.method
-                    : "Non-coal · " + profile.method}
-              </small>
-            </span>
-            <Settings2 size={15} />
-          </button>
-          <div className="sidebar-footer">
-            <span className="status-dot" />
-            {manifest
-              ? "Evidence connected"
-              : libraryError
-                ? "Library unavailable"
-                : "Loading evidence"}{" "}
-            <span>v1.0</span>
-          </div>
-        </div>
-      </aside>
+      <Sidebar
+        view={view}
+        open={menuOpen}
+        collapsed={sidebarCollapsed}
+        busy={busy}
+        online={online}
+        status={manifest ? "Evidence connected" : libraryError ? "Library unavailable" : status}
+        cases={manifest?.cases}
+        profileName={profile.name}
+        profileSummary={
+          profile.sector === "all"
+            ? "Set mine type & conditions"
+            : (profile.sector === "coal" ? "Coal · " : "Non-coal · ") + profile.method
+        }
+        onViewChange={changeView}
+        onNewChat={() => {
+          if (!conversation.clear()) return;
+          setQuestion("");
+          changeView("chat");
+          requestAnimationFrame(() => input.current?.focus());
+        }}
+        onEditProfile={editProfile}
+        onClose={closeMenu}
+        onToggleCollapse={() => setSidebarCollapsed((value) => !value)}
+      />
       <main className="workspace">
         <header className="topbar">
           <div className="breadcrumb">
@@ -588,85 +517,30 @@ export default function Home() {
                             <span>You</span>
                             <p>{t.question}</p>
                           </div>
-                          <AnswerView
+                          <ChatMessage
                             turn={t}
                             busy={busy}
                             onRetry={retry}
                             onSource={openSource}
                             onCopy={copy}
                             onDownload={download}
+                            onShare={share}
                           />
                         </div>
                       ))}
                     </div>
                   )}
                 </div>
-                <div className="composer-wrap">
-                  <form
-                    className="composer"
-                    onSubmit={(e) => {
-                      e.preventDefault();
-                      ask(question);
-                    }}
-                  >
-                    <textarea
-                      ref={input}
-                      value={question}
-                      onChange={(e) => setQuestion(e.target.value)}
-                      maxLength={1800}
-                      placeholder="Ask about mining hazards, past incidents, or prevention…"
-                      aria-label="Ask SANKET"
-                      rows={2}
-                      onKeyDown={(e) => {
-                        if (
-                          e.key === "Enter" &&
-                          !e.shiftKey &&
-                          !e.nativeEvent.isComposing
-                        ) {
-                          e.preventDefault();
-                          ask(question);
-                        }
-                      }}
-                    />
-                    <div className="composer-bottom">
-                      <button
-                        type="button"
-                        className="source-pill"
-                        onClick={() => changeView("books")}
-                      >
-                        <BookOpen size={14} />
-                        SANKET · Coal + Non-coal
-                        <ChevronDown size={11} />
-                      </button>
-                      <div className="composer-right">
-                        <span>Enter to send</span>
-                        {busy ? (
-                          <button
-                            className="send-button stop-button"
-                            type="button"
-                            aria-label="Stop answer"
-                            onClick={conversation.stop}
-                          >
-                            <span />
-                          </button>
-                        ) : (
-                          <button
-                            className="send-button"
-                            type="submit"
-                            disabled={question.trim().length < 2}
-                            aria-label="Send question"
-                          >
-                            <ArrowUp size={20} />
-                          </button>
-                        )}
-                      </div>
-                    </div>
-                  </form>
-                  <p className="composer-caption">
-                    Historical evidence supports your judgment. Site conditions
-                    and authorized procedures come first.
-                  </p>
-                </div>
+                <ChatInput
+                  value={question}
+                  busy={busy}
+                  inputRef={input}
+                  onChange={setQuestion}
+                  onSubmit={() => ask(question)}
+                  onQuickAction={(prompt) => ask(prompt)}
+                  onStop={conversation.stop}
+                  onOpenBooks={() => changeView("books")}
+                />
               </>
             )}
             {view === "brief" && (
@@ -750,13 +624,14 @@ export default function Home() {
                 </p>
                 {briefTurn && (
                   <div className="brief-result">
-                    <AnswerView
+                    <ChatMessage
                       turn={briefTurn}
                       busy={busy}
                       onRetry={retry}
                       onSource={openSource}
                       onCopy={copy}
                       onDownload={download}
+                      onShare={share}
                     />
                   </div>
                 )}
