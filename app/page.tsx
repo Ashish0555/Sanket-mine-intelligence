@@ -127,7 +127,11 @@ export default function Home() {
   const [limit, setLimit] = useState(24);
   const [menuOpen, setMenuOpen] = useState(false);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
-  const [theme, setTheme] = useState<"light" | "dark">("light");
+  const [theme, setTheme] = useState<"light" | "dark">(() => {
+    if (typeof window === "undefined") return "light";
+    const savedTheme = window.localStorage.getItem("sanket-theme");
+    return savedTheme === "dark" ? "dark" : "light";
+  });
   const [toast, setToast] = useState("");
   const input = useRef<HTMLTextAreaElement>(null);
   const sourceRequest = useRef<AbortController | null>(null);
@@ -146,6 +150,7 @@ export default function Home() {
   }, []);
   useEffect(() => {
     document.documentElement.dataset.theme = theme;
+    window.localStorage.setItem("sanket-theme", theme);
   }, [theme]);
 
   useEffect(() => {

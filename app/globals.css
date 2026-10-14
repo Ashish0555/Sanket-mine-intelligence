@@ -3707,3 +3707,185 @@ body {
   background: #1d2b23;
   border-color: #385344;
 }
+
+/* Dark-mode and navbar controls need explicit values because older component
+   rules use pale defaults and native select styling is browser-dependent. */
+.enterprise-navbar {
+  color: #4f6258;
+}
+.enterprise-navbar .sidebar-toggle-desktop {
+  border-color: #d8e4dc;
+  background: #fff;
+  color: #527162;
+}
+.navbar-context-controls {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-left: auto;
+}
+.navbar-select {
+  position: relative;
+  display: grid;
+  grid-template-columns: 16px auto minmax(92px, 1fr) 14px;
+  align-items: center;
+  min-width: 214px;
+  min-height: 42px;
+  gap: 8px;
+  padding: 0 11px;
+  border: 1px solid #d7e3da;
+  border-radius: 11px;
+  background: #fff;
+  color: #74857b;
+  box-shadow: 0 3px 10px #214b3509;
+  transition: border-color .18s, box-shadow .18s, background .18s;
+}
+.navbar-select:hover,
+.navbar-select:focus-within {
+  border-color: #8fb8a0;
+  box-shadow: 0 0 0 3px #69a47b18, 0 4px 12px #214b350d;
+}
+.navbar-select > svg:first-child {
+  color: #3d7759;
+}
+.navbar-select > svg:last-child {
+  color: #87988d;
+}
+.navbar-select > span {
+  color: #8a998f;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: .07em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+.navbar-select select,
+.navbar-select select:focus {
+  width: 100%;
+  min-width: 0;
+  color: #294638 !important;
+  font-size: 12px;
+  font-weight: 650;
+  cursor: pointer;
+}
+.navbar-select select option {
+  background: #fff;
+  color: #294638;
+}
+[data-theme="dark"] .enterprise-navbar {
+  background: #142019f5;
+  border-bottom-color: #2e4739;
+  color: #b6cabe;
+  box-shadow: 0 3px 18px #0000001f;
+}
+[data-theme="dark"] .enterprise-navbar .breadcrumb,
+[data-theme="dark"] .enterprise-navbar .breadcrumb strong {
+  color: #c5d8ca;
+}
+[data-theme="dark"] .enterprise-navbar .breadcrumb > span {
+  color: #80978a;
+}
+[data-theme="dark"] .enterprise-navbar .navbar-divider {
+  color: #4e6a59;
+}
+[data-theme="dark"] .enterprise-navbar .sidebar-toggle-desktop {
+  border-color: #3a5948;
+  background: #1d3025;
+  color: #a9c8b2;
+}
+[data-theme="dark"] .navbar-select {
+  border-color: #3a5948;
+  background: #1e3026;
+  color: #9bb5a3;
+  box-shadow: 0 4px 14px #0000001a;
+}
+[data-theme="dark"] .navbar-select:hover,
+[data-theme="dark"] .navbar-select:focus-within {
+  border-color: #75b18a;
+  background: #24392c;
+  box-shadow: 0 0 0 3px #79ba8a20, 0 4px 14px #00000022;
+}
+[data-theme="dark"] .navbar-select > svg:first-child {
+  color: #86c39a;
+}
+[data-theme="dark"] .navbar-select > svg:last-child {
+  color: #9ab6a3;
+}
+[data-theme="dark"] .navbar-select > span {
+  color: #8fa99a;
+}
+[data-theme="dark"] .navbar-select select,
+[data-theme="dark"] .navbar-select select:focus {
+  color: #e1f1e5 !important;
+  background: transparent;
+}
+[data-theme="dark"] .navbar-select select option {
+  background: #1d3025;
+  color: #e1f1e5;
+}
+[data-theme="dark"] .enterprise-sidebar .sidebar-status-card > span,
+[data-theme="dark"] .enterprise-sidebar .sidebar-status-card small,
+[data-theme="dark"] .enterprise-sidebar .sidebar-bottom-controls > button,
+[data-theme="dark"] .enterprise-sidebar .mine-context small {
+  color: #a7bcae;
+}
+[data-theme="dark"] .enterprise-sidebar nav button,
+[data-theme="dark"] .enterprise-sidebar .sidebar-settings-button {
+  color: #a9c1b0;
+}
+[data-theme="dark"] .enterprise-sidebar nav button:hover,
+[data-theme="dark"] .enterprise-sidebar .sidebar-settings-button:hover {
+  background: #24402f;
+  color: #e1f1e5;
+}
+[data-theme="dark"] .enterprise-sidebar nav button.selected {
+  background: #28503a;
+  color: #effaf1;
+  box-shadow: inset 3px 0 #8bc69b, 0 3px 10px #00000018;
+}
+[data-theme="dark"] .enterprise-sidebar .new-chat {
+  border-color: #46654f;
+  background: #e4f1e7;
+  color: #1b4430;
+}
+[data-theme="dark"] .enterprise-sidebar .sidebar-status-card {
+  border-color: #3a5948;
+  background: #1d3026;
+}
+[data-theme="dark"] .enterprise-sidebar .sidebar-status-card strong,
+[data-theme="dark"] .enterprise-sidebar .mine-context strong {
+  color: #e1f1e5;
+}
+[data-theme="dark"] .enterprise-sidebar .sidebar-bottom-controls {
+  border-top-color: #385343;
+}
+[data-theme="dark"] .enterprise-sidebar .sidebar-avatar {
+  background: #31563e;
+  color: #d5ebd9;
+}
+@media (max-width: 900px) {
+  .navbar-select {
+    min-width: 170px;
+    grid-template-columns: 16px minmax(0, 1fr) 14px;
+  }
+  .navbar-select > span {
+    display: none;
+  }
+}
+@media (max-width: 760px) {
+  .navbar-context-controls {
+    gap: 6px;
+  }
+  .navbar-select {
+    min-width: 0;
+    width: 42px;
+    grid-template-columns: 16px 14px;
+    padding: 0 9px;
+  }
+  .navbar-select select {
+    position: absolute;
+    width: 42px;
+    height: 42px;
+    opacity: 0;
+  }
+}
