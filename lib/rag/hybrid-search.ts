@@ -9,6 +9,8 @@ export type RetrievalFilter = {
   method?: MineMethod;
   sector?: MineSector;
   domain?: RegulationDomain;
+  equipment_type?: string;
+  hazard_category?: string;
 };
 
 type Ranked = { source: Source; rank: number; exact: number };
@@ -27,6 +29,23 @@ const domainPatterns: [RegulationDomain, RegExp][] = [
   ['strata_roof', /\b(rockburst|rock burst|roof|strata|fall of ground|highwall|slope stability|support)\b/i],
   ['machinery_chp', /\b(conveyor|crusher|feeder|winder|winding|rope|trailing cable|lhd|sdl|machinery|chp)\b/i],
   ['hauling', /\b(dumper|truck|tipper|haul road|collision|vehicle|parking|runaway)\b/i],
+];
+const equipmentPatterns: [string, RegExp][] = [
+  ['locomotive', /\b(locomotive|haulage)\b/i],
+  ['dozer', /\b(dozer|bulldozer)\b/i],
+  ['hauler', /\b(dumper|truck|tipper|hauler)\b/i],
+  ['winder', /\b(winder|winding|hoist|rope)\b/i],
+  ['flp_switchgear', /\b(flp|flameproof|switchgear|feeler gauge|gap tolerance)\b/i],
+  ['continuous_miner', /\b(continuous miner|cutter drum)\b/i],
+  ['sdl_lhd', /\b(sdl|lhd|load haul dump)\b/i],
+];
+const hazardPatterns: [string, RegExp][] = [
+  ['spontaneous_combustion', /\b(goaf|spontaneous combustion|heating|sealed goaf)\b/i],
+  ['gas_ventilation', /\b(methane|firedamp|fire damp|gas|ventilation|auxiliary fan|recirculation)\b/i],
+  ['strata_roof', /\b(rockburst|rock burst|roof|strata|fall of ground|highwall)\b/i],
+  ['inundation', /\b(waterlogged|water[\s-]logged|inrush|inundation|old workings)\b/i],
+  ['electrical', /\b(electrical|electric|short circuit|switchgear|cable|flp)\b/i],
+  ['machinery', /\b(machinery|conveyor|feeder|locomotive|haulage|continuous miner|sdl|lhd)\b/i],
 ];
 
 const lexicalTerms: Record<string, string[]> = {
@@ -59,6 +78,8 @@ export function classifySource(source: Source): RetrievalFilter {
     method: methodPatterns.find(([, pattern]) => pattern.test(text))?.[0],
     sector: source.sector === 'coal' ? 'coal' : 'non_coal_metal',
     domain: domainPatterns.find(([, pattern]) => pattern.test(text))?.[0],
+    equipment_type: equipmentPatterns.find(([, pattern]) => pattern.test(text))?.[0],
+    hazard_category: hazardPatterns.find(([, pattern]) => pattern.test(text))?.[0],
   };
 }
 
@@ -66,7 +87,9 @@ function passesFilter(source: Source, filter: RetrievalFilter) {
   const metadata = classifySource(source);
   return (!filter.method || metadata.method === filter.method) &&
     (!filter.sector || metadata.sector === filter.sector) &&
-    (!filter.domain || metadata.domain === filter.domain);
+  (!filter.domain || metadata.domain === filter.domain) &&
+  (!filter.equipment_type || metadata.equipment_type === filter.equipment_type) &&
+  (!filter.hazard_category || metadata.hazard_category === filter.hazard_category);
 }
 
 function exactMatches(source: Source, question: string) {
@@ -77,10 +100,10 @@ function exactMatches(source: Source, question: string) {
   return terms.filter(term => haystack.includes(term)).length;
 }
 
-function rankWithRrf(results: Source[], weight: number, filter: RetrievalFilter): Ranked[] {
+function rankWithRrf(results: Source[], filter: RetrievalFilter): Ranked[] {
   return results.filter(source => passesFilter(source, filter)).map((source, index) => ({
     source,
-    rank: 1 / (60 + index + 1) * weight,
+    rank: 1 / (60 + index + 1),
     exact: 0,
   }));
 }
@@ -101,7 +124,7 @@ export function hybridSearch(question: string, sector = 'all', limit = 6, fireOn
     .join(' ');
   const lexical = search(`${question} ${keywordQuery}`, sector, 20, fireOnly);
   const fused = new Map<string, Ranked>();
-  for (const result of [...rankWithRrf(dense, .55, effective), ...rankWithRrf(lexical, .45, effective)]) {
+  for (const result of [...rankWithRrf(dense, effective), ...rankWithRrf(lexical, effective)]) {
     const current = fused.get(result.source.id);
     if (current) {
       current.rank += result.rank;

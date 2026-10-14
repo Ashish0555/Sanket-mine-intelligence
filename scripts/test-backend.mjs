@@ -5,6 +5,7 @@ import { loadTypeScript } from './test-support.mjs';
 const { POST } = loadTypeScript('app/api/chat/route.ts');
 const { GET } = loadTypeScript('app/api/source/route.ts');
 const { search, bookAnswer, defaultProfile, retrievalQuestion, getSource } = loadTypeScript('lib/knowledge.ts');
+const { classifyQueryIntent, retrieveHybrid } = loadTypeScript('lib/rag/hybrid-retriever.ts');
 const { readBody } = loadTypeScript('lib/request.ts');
 const originalKey = process.env.GEMINI_API_KEY;
 const originalModel = process.env.GEMINI_MODEL;
@@ -59,6 +60,13 @@ try {
     assert.ok(cable.some(source => ['N-2019-29', 'C-2021-32', 'C-2019-28'].includes(source.id)));
     const gas = search('methane firedamp exceeding 1.25 percent gas monitoring', 'coal', 3);
     assert.ok(gas.some(source => ['C-2018-42', 'C-2016-56'].includes(source.id)));
+  });
+  await check('technical intent applies strict context and returns a clean gap', () => {
+    assert.deepEqual(classifyQueryIntent('underground locomotive machinery'), {
+      method: 'underground', equipment_type: 'locomotive', hazard_category: 'machinery',
+      mandatoryTerms: ['locomotive', 'haulage', 'machinery', 'conveyor', 'feeder'],
+    });
+    assert.deepEqual(retrieveHybrid('FLP switchgear gap tolerances', 'all', 3), []);
   });
   await check('strict body schema rejects all browser credential overrides', async () => {
     for (const extra of [
