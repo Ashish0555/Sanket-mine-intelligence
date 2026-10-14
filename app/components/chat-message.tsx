@@ -6,15 +6,11 @@ import {
   BookOpen,
   Check,
   ClipboardCheck,
-  Copy,
-  Download,
   FileText,
   LoaderCircle,
-  Share2,
 } from "lucide-react";
 import { Logo } from "../ui/brand";
 import type { Turn } from "../ui/conversation";
-import { ExportBriefingButton } from "./chat/export-pdf";
 
 const statutoryReference =
   /\b(?:Regulation|Reg\.|Rule|Section)\s+\d+(?:\([^)]+\))?(?:\s*[-–]\s*\w+)?|\b(?:CMR|MMR)\s*(?:2017|1961)\b(?:\s*(?:Regulation|Reg\.)\s*\d+(?:\([^)]+\))?)?/gi;
@@ -64,17 +60,11 @@ export function ChatMessage({
   busy,
   onRetry,
   onSource,
-  onCopy,
-  onDownload,
-  onShare,
 }: {
   turn: Turn;
   busy: boolean;
   onRetry: (turn: Turn) => void;
   onSource: (id: string) => void;
-  onCopy: (turn: Turn) => void;
-  onDownload: (turn: Turn) => void;
-  onShare: (turn: Turn) => void;
 }) {
   const a = turn.answer;
   if (turn.error)
@@ -102,33 +92,6 @@ export function ChatMessage({
     <article
       className={"answer enterprise-answer " + (a.mode === "emergency" ? "emergency" : "")}
     >
-      <div className="answer-card-toolbar">
-        <div className="answer-byline">
-          <Logo small />
-          <strong>SANKET</strong>
-          <span className="answer-mode">
-            {a.mode === "synthesis"
-              ? "SANKET analysis"
-              : a.mode === "book"
-                ? "Book evidence"
-                : a.mode === "emergency"
-                  ? "Immediate guidance"
-                  : "Evidence boundary"}
-          </span>
-        </div>
-        <div className="answer-quick-tools">
-          <ExportBriefingButton turn={turn} />
-          <button onClick={() => onCopy(turn)} title="Copy Markdown">
-            <Copy size={14} /> <span>Copy Markdown</span>
-          </button>
-          <button onClick={() => onDownload(turn)} title="Export inquiry">
-            <Download size={14} /> <span>Export</span>
-          </button>
-          <button onClick={() => onShare(turn)} title="Share inquiry">
-            <Share2 size={14} /> <span>Share</span>
-          </button>
-        </div>
-      </div>
       <h2>{a.title}</h2>
       <div className="lead-summary">{renderLead(a.lead)}</div>
       {a.actions.length > 0 && (

@@ -25,12 +25,10 @@ import {
 import type { MineProfile, Source } from "../lib/knowledge";
 import { ChatInput } from "./components/chat-input";
 import { ChatMessage } from "./components/chat-message";
-import { SourceCarousel } from "./components/chat/source-carousel";
 import { Navbar } from "./components/navbar";
 import { Sidebar, type WorkspaceView } from "./components/sidebar";
 import { Dialog } from "./ui/dialog";
 import {
-  answerText,
   initialProfile,
   isSource,
   normalizeProfile,
@@ -343,47 +341,6 @@ export default function Home() {
       }
     }
   }
-  function download(turn: Turn) {
-    if (!turn.answer) return;
-    const url = URL.createObjectURL(
-      new Blob(
-        [answerText(turn.answer, turn.question, window.location.origin)],
-        { type: "text/plain;charset=utf-8" },
-      ),
-    );
-    const link = document.createElement("a");
-    link.href = url;
-    link.download =
-      "SANKET-" + (turn.briefing ? "officer-briefing" : "answer") + ".txt";
-    document.body.appendChild(link);
-    link.click();
-    link.remove();
-    setTimeout(() => URL.revokeObjectURL(url), 500);
-  }
-  async function copy(turn: Turn) {
-    if (!turn.answer) return;
-    try {
-      await navigator.clipboard.writeText(
-        answerText(turn.answer, turn.question, window.location.origin),
-      );
-      notify("Answer and citations copied");
-    } catch {
-      notify("Copy is unavailable. Use Download instead.");
-    }
-  }
-  async function share(turn: Turn) {
-    if (!turn.answer) return;
-    const text = answerText(turn.answer, turn.question, window.location.origin);
-    if (navigator.share) {
-      try {
-        await navigator.share({ title: "SANKET inquiry", text });
-        return;
-      } catch {
-        return;
-      }
-    }
-    await copy(turn);
-  }
   const shown = catalog.filter(
     (c) =>
       (!fireOnly || c.fire) &&
@@ -537,20 +494,11 @@ export default function Home() {
                             <span>You</span>
                             <p>{t.question}</p>
                           </div>
-                          {t.answer && (
-                            <SourceCarousel
-                              sources={t.answer.sources}
-                              onSource={openSource}
-                            />
-                          )}
                           <ChatMessage
                             turn={t}
                             busy={busy}
                             onRetry={retry}
                             onSource={openSource}
-                            onCopy={copy}
-                            onDownload={download}
-                            onShare={share}
                           />
                         </div>
                       ))}
@@ -656,9 +604,6 @@ export default function Home() {
                       busy={busy}
                       onRetry={retry}
                       onSource={openSource}
-                      onCopy={copy}
-                      onDownload={download}
-                      onShare={share}
                     />
                   </div>
                 )}
