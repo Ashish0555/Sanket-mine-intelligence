@@ -65,6 +65,16 @@ const expansions: [
     [/\b(karan|kyun|wajah)\b|कारण|क्यों/i, 'inquiry cause prevention'],
     [/\b(rok|bachne|safety)\b|रोक|सुरक्षा/i, 'prevention precautions supervision procedure'],
     [/\b(pani|flood|inundation)\b|पानी/i, 'water inundation flooding pumping'],
+    [/\b(winding|winder|hoist|rope snap|rope break|overwind|safety catch|shaft cage)\b/i, 'winding engine winding rope shaft cage overwind brake safety catch rope clamp'],
+    [/\b(trailing cable|coal cutter|sdl|lhd|insulation|short circuit|earth leakage|flameproof)\b/i, 'trailing cable insulation short circuit earth leakage coal cutter SDL LHD flameproof electrical protection'],
+    [/\b(methane|firedamp|gas monitoring|gas detector|gas percentage|1\.25\s*%?|withdrawal on gas)\b/i, 'methane firedamp ventilation gas monitoring detector percentage power cut withdrawal'],
+    [/\b(water[\s-]?logged|inrush|old workings|isolation stopping|barrier)\b/i, 'water logged workings inundation inrush isolation stopping barrier survey'],
+];
+const technicalTopics: { pattern: RegExp; terms: string[] }[] = [
+    { pattern: /\b(winding|winder|hoist|rope snap|rope break|overwind|safety catch|shaft cage)\b/i, terms: ['winding', 'winder', 'hoist', 'rope', 'overwind', 'cage', 'shaft', 'brake', 'safety catch', 'rope clamp'] },
+    { pattern: /\b(trailing cable|coal cutter|sdl|lhd|insulation|short circuit|earth leakage|flameproof)\b/i, terms: ['trailing cable', 'insulation', 'short circuit', 'earth leakage', 'coal cutter', 'sdl', 'lhd', 'flameproof'] },
+    { pattern: /\b(methane|firedamp|gas monitoring|gas detector|gas percentage|1\.25\s*%?|withdrawal on gas)\b/i, terms: ['methane', 'firedamp', 'gas', 'ventilation', 'detector', 'power cut', 'withdrawal'] },
+    { pattern: /\b(water[\s-]?logged|inrush|old workings|isolation stopping|barrier)\b/i, terms: ['waterlogged', 'water logged', 'inrush', 'old workings', 'isolation stopping', 'barrier'] },
 ];
 export function tokenize(text: string) { return (text.toLowerCase().match(/[a-z][a-z0-9]{1,}/g) || []).filter(w => !stops.has(w)); }
 export function expand(text: string) { return text + ' ' + expansions.filter(([r]) => r.test(text)).map(([, s]) => s).join(' '); }
@@ -135,6 +145,7 @@ export function search(question: string, sector = 'all', limit = 6, fireOnly = f
         }
     }
     const vec = queryVector(words), max = Math.max(...bm) || 1;
+    const topics = technicalTopics.filter(topic => topic.pattern.test(question));
     const ranked = docs.map((d, i) => {
         let cosine = 0;
         for (let j = 0; j < 64; j++)
@@ -143,6 +154,14 @@ export function search(question: string, sector = 'all', limit = 6, fireOnly = f
         const named = titleTokens.length && titleTokens.some(t => t.length > 3 && !genericNames.has(t) && original.includes(t));
         const coverage = matched[i] / Math.max(1, original.length);
         let score = .66 * bm[i] / max + .24 * Math.max(0, cosine) + .10 * coverage;
+        if (topics.length) {
+            const haystack = `${d.title} ${d.category} ${d.text} ${d.inquiry || ''}`.toLowerCase();
+            const topicMatches = topics.reduce((total, topic) => total + topic.terms.filter(term => haystack.includes(term)).length, 0);
+            if (topicMatches)
+                score += Math.min(.24, topicMatches * .04);
+            else
+                score *= .7;
+        }
         if (d.kind === 'case')
             score *= 1.12;
         if (named && d.kind === 'case')

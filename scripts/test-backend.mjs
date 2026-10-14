@@ -51,6 +51,15 @@ try {
     assert.deepEqual(answer.sources.map(source => source.id), ['C-2016-29']);
     assert.ok(answer.findings.every(finding => finding.citations.includes('C-2016-29')));
   });
+  await check('technical machinery and gas queries prioritize matching case categories', () => {
+    const winding = search('winding engine safety rope snaps overwind safety catch', 'all', 3);
+    assert.equal(winding[0].id, 'N-2022-15');
+    assert.equal(winding[0].kind, 'case');
+    const cable = search('trailing cable electrical fire insulation short circuit', 'all', 3);
+    assert.ok(cable.some(source => ['N-2019-29', 'C-2021-32', 'C-2019-28'].includes(source.id)));
+    const gas = search('methane firedamp exceeding 1.25 percent gas monitoring', 'coal', 3);
+    assert.ok(gas.some(source => ['C-2018-42', 'C-2016-56'].includes(source.id)));
+  });
   await check('strict body schema rejects all browser credential overrides', async () => {
     for (const extra of [
       { apiKey: 'browser-key' }, { model: 'browser-model' },
