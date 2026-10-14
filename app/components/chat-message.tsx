@@ -14,6 +14,7 @@ import {
 } from "lucide-react";
 import { Logo } from "../ui/brand";
 import type { Turn } from "../ui/conversation";
+import { ExportBriefingButton } from "./chat/export-pdf";
 
 const statutoryReference =
   /\b(?:Regulation|Reg\.|Rule|Section)\s+\d+(?:\([^)]+\))?(?:\s*[-–]\s*\w+)?|\b(?:CMR|MMR)\s*(?:2017|1961)\b(?:\s*(?:Regulation|Reg\.)\s*\d+(?:\([^)]+\))?)?/gi;
@@ -116,6 +117,7 @@ export function ChatMessage({
           </span>
         </div>
         <div className="answer-quick-tools">
+          <ExportBriefingButton turn={turn} />
           <button onClick={() => onCopy(turn)} title="Copy Markdown">
             <Copy size={14} /> <span>Copy Markdown</span>
           </button>

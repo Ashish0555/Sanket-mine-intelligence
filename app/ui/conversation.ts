@@ -15,6 +15,8 @@ export const initialProfile: MineProfile = {
   name: "",
   sector: "all",
   method: "Not specified",
+  mineType: "unspecified",
+  gassiness: "unspecified",
   conditions: "",
 };
 export const workingMethods = [
@@ -38,6 +40,19 @@ export function normalizeProfile(value: unknown): MineProfile {
       typeof input.method === "string" && workingMethods.includes(input.method)
         ? input.method
         : "Not specified",
+    mineType:
+      input.mineType === "underground-coal" ||
+      input.mineType === "opencast-coal" ||
+      input.mineType === "metal-mine"
+        ? input.mineType
+        : "unspecified",
+    gassiness:
+      input.gassiness === "degree-i" ||
+      input.gassiness === "degree-ii" ||
+      input.gassiness === "degree-iii" ||
+      input.gassiness === "non-gassy"
+        ? input.gassiness
+        : "unspecified",
     conditions:
       typeof input.conditions === "string"
         ? input.conditions.trim().slice(0, 1200)

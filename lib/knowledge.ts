@@ -5,6 +5,8 @@ export type MineProfile = {
     name: string;
     sector: 'all' | 'coal' | 'noncoal';
     method: string;
+    mineType: 'underground-coal' | 'opencast-coal' | 'metal-mine' | 'unspecified';
+    gassiness: 'degree-i' | 'degree-ii' | 'degree-iii' | 'non-gassy' | 'unspecified';
     conditions: string;
 };
 export type Passage = {
@@ -198,7 +200,14 @@ export type Answer = {
     mode: string;
     notice?: string;
 };
-export const defaultProfile: MineProfile = { name: '', sector: 'all', method: 'Not specified', conditions: '' };
+export const defaultProfile: MineProfile = {
+    name: '',
+    sector: 'all',
+    method: 'Not specified',
+    mineType: 'unspecified',
+    gassiness: 'unspecified',
+    conditions: '',
+};
 export function bookAnswer(question: string, sources: Source[], profile: MineProfile, briefing = false): Answer {
     if (!sources.length)
         return { title: 'The books do not give me enough evidence', lead: 'Try a mine name, a task, or a more specific hazard. I will not invent an answer or a current legal requirement.', findings: [], actions: [], questions: ['Which mine type, task and conditions are involved?'], sources: [], mode: 'not_found' };

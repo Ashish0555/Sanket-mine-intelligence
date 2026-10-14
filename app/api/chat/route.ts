@@ -14,6 +14,8 @@ const schema = z.object({
     name: z.string().trim().max(80),
     sector: z.enum(['all', 'coal', 'noncoal']),
     method: z.string().trim().max(80),
+    mineType: z.enum(['underground-coal', 'opencast-coal', 'metal-mine', 'unspecified']).default('unspecified'),
+    gassiness: z.enum(['degree-i', 'degree-ii', 'degree-iii', 'non-gassy', 'unspecified']).default('unspecified'),
     conditions: z.string().trim().max(1200),
   }).strict().optional(),
   briefing: z.boolean().optional(),
@@ -50,7 +52,7 @@ export async function POST(request: Request) {
     }
 
     const retrievalQuery = briefing
-      ? `fire burning ground fuel maintenance supervision escape ${profile.method} ${profile.conditions}`
+      ? `fire burning ground fuel maintenance supervision escape ${profile.method} ${profile.mineType} ${profile.gassiness} ${profile.conditions}`
       : retrievalQuestion(question, history);
     let sources = retrieveHybrid(retrievalQuery, profile.sector, 7, briefing);
     if (briefing) {

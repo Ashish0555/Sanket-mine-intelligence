@@ -7,14 +7,13 @@ import {
   BookOpen,
   Check,
   ChevronDown,
-  ChevronRight,
   Compass,
   ExternalLink,
   FileText,
   Flame,
+  HardHat,
   Layers3,
   LoaderCircle,
-  Menu,
   MessageSquare,
   Search,
   Settings2,
@@ -22,11 +21,12 @@ import {
   Sparkles,
   X,
   Waypoints,
-  HardHat,
 } from "lucide-react";
 import type { MineProfile, Source } from "../lib/knowledge";
 import { ChatInput } from "./components/chat-input";
 import { ChatMessage } from "./components/chat-message";
+import { SourceCarousel } from "./components/chat/source-carousel";
+import { Navbar } from "./components/navbar";
 import { Sidebar, type WorkspaceView } from "./components/sidebar";
 import { Dialog } from "./ui/dialog";
 import {
@@ -105,14 +105,6 @@ const topicPrompts: Record<string, string> = {
   "Roof & strata":
     "What do the coal cases say about roof support and falling strata?",
 };
-const formatTitle = (view: View) =>
-  ({
-    chat: "Ask SANKET",
-    brief: "Officer briefing",
-    cases: "Case library",
-    books: "Knowledge base",
-  })[view];
-
 function suggestionsForTurn(turn?: Turn): { label: string; prompt: string }[] {
   if (!turn?.answer) {
     return [
@@ -172,6 +164,7 @@ export default function Home() {
   const [limit, setLimit] = useState(24);
   const [menuOpen, setMenuOpen] = useState(false);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [theme, setTheme] = useState<"light" | "dark">("light");
   const [toast, setToast] = useState("");
   const input = useRef<HTMLTextAreaElement>(null);
   const sourceRequest = useRef<AbortController | null>(null);
@@ -188,6 +181,9 @@ export default function Home() {
     setSourceBusy(false);
     setSourceError("");
   }, []);
+  useEffect(() => {
+    document.documentElement.dataset.theme = theme;
+  }, [theme]);
 
   useEffect(() => {
     const controller = new AbortController();
@@ -247,6 +243,11 @@ export default function Home() {
   }, []);
   useEffect(() => {
     function onKey(event: KeyboardEvent) {
+      if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === "b") {
+        event.preventDefault();
+        setSidebarCollapsed((value) => !value);
+        return;
+      }
       if (
         (event.metaKey || event.ctrlKey) &&
         event.key.toLowerCase() === "k" &&
@@ -286,6 +287,14 @@ export default function Home() {
       notify(
         "Mine context updated for this session. Browser storage is unavailable.",
       );
+    }
+  }
+  function updateProfile(next: MineProfile) {
+    setProfile(next);
+    try {
+      localStorage.setItem("sanket-profile", JSON.stringify(next));
+    } catch {
+      notify("Mine context updated for this session.");
     }
   }
   function ask(text: string, briefing = false) {
@@ -412,45 +421,18 @@ export default function Home() {
         onEditProfile={editProfile}
         onClose={closeMenu}
         onToggleCollapse={() => setSidebarCollapsed((value) => !value)}
+        theme={theme}
+        onToggleTheme={() => setTheme((value) => (value === "light" ? "dark" : "light"))}
       />
       <main className="workspace">
-        <header className="topbar">
-          <div className="breadcrumb">
-            <button
-              className="mobile-menu icon-button"
-              aria-label="Open navigation"
-              aria-expanded={menuOpen}
-              aria-controls="workspace-navigation"
-              onClick={() => setMenuOpen(true)}
-            >
-              <Menu size={21} />
-            </button>
-            <span>Workspace</span>
-            <ChevronRight size={14} />
-            <strong>{formatTitle(view)}</strong>
-          </div>
-          <div className="top-actions">
-            {busy && (
-              <button className="request-stop" onClick={conversation.stop}>
-                <X size={14} />
-                Stop answer
-              </button>
-            )}
-            <button className="context-button" onClick={editProfile}>
-              <HardHat size={15} />
-              {profile.sector === "all"
-                ? "All mining"
-                : profile.sector === "coal"
-                  ? "Coal mining"
-                  : "Non-coal mining"}
-              <ChevronDown size={13} />
-            </button>
-            <span className="evidence-badge">
-              <ShieldCheck size={15} />
-              Source-grounded
-            </span>
-          </div>
-        </header>
+        <Navbar
+          profile={profile}
+          busy={busy}
+          collapsed={sidebarCollapsed}
+          onProfileChange={updateProfile}
+          onToggleSidebar={() => setSidebarCollapsed((value) => !value)}
+          onOpenMenu={() => setMenuOpen(true)}
+        />
         {libraryError && (
           <div className="inline-error" role="alert">
             {libraryError}
@@ -555,6 +537,12 @@ export default function Home() {
                             <span>You</span>
                             <p>{t.question}</p>
                           </div>
+                          {t.answer && (
+                            <SourceCarousel
+                              sources={t.answer.sources}
+                              onSource={openSource}
+                            />
+                          )}
                           <ChatMessage
                             turn={t}
                             busy={busy}

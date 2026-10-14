@@ -11,6 +11,8 @@ import {
   Settings2,
   ShieldCheck,
   X,
+  Moon,
+  Sun,
 } from "lucide-react";
 import { Logo } from "../ui/brand";
 
@@ -31,6 +33,8 @@ export function Sidebar({
   onEditProfile,
   onClose,
   onToggleCollapse,
+  theme,
+  onToggleTheme,
 }: {
   view: WorkspaceView;
   open: boolean;
@@ -46,6 +50,8 @@ export function Sidebar({
   onEditProfile: () => void;
   onClose: () => void;
   onToggleCollapse: () => void;
+  theme: "light" | "dark";
+  onToggleTheme: () => void;
 }) {
   const sections = [
     {
@@ -171,6 +177,15 @@ export function Sidebar({
         </span>
         <ChevronRight size={15} />
       </button>
+      <div className="sidebar-bottom-controls">
+        <button onClick={onToggleTheme} title="Toggle color theme">
+          {theme === "light" ? <Moon size={16} /> : <Sun size={16} />}
+          <span>{theme === "light" ? "Dark mode" : "Light mode"}</span>
+        </button>
+        <span className="sidebar-avatar" aria-label={profileName || "User profile"}>
+          {(profileName || "S").slice(0, 1).toUpperCase()}
+        </span>
+      </div>
     </aside>
   );
 }
