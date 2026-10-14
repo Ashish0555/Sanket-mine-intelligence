@@ -121,6 +121,25 @@ type SynthesisRequest = {
   signal?: AbortSignal;
 };
 
+async function parseAnswerResponse(response: Response, sources: Source[]): Promise<Answer> {
+  const data = await response.json() as {
+    candidates?: { content?: { parts?: { text?: string; thought?: boolean }[] }; finishReason?: string }[];
+  } | null;
+  const candidate = data?.candidates?.[0];
+  if (candidate?.finishReason && candidate.finishReason !== 'STOP') {
+    throw new Error('The answer service returned an incomplete answer. Showing book evidence instead.');
+  }
+  const text = candidate?.content?.parts?.filter(part => !part.thought).map(part => part.text || '').join('');
+  if (!text) throw new Error('The answer service did not return an answer. Showing book evidence instead.');
+  let parsed: unknown;
+  try {
+    parsed = JSON.parse(text);
+  } catch {
+    throw new Error('The answer service returned an incomplete answer. Showing book evidence instead.');
+  }
+  return validateAnswer(parsed, sources);
+}
+
 export async function synthesize({ question, sources, profile, key, model, history, briefing, signal }: SynthesisRequest): Promise<Answer> {
   if (!validModel(model)) throw new Error(friendlyError(400));
   const evidence = sources.map(source => ({
@@ -176,20 +195,36 @@ export async function synthesize({ question, sources, profile, key, model, histo
   }
   if (!response) throw new Error('The answer service is temporarily unavailable. Showing the retrieved book evidence instead.');
   if (!response.ok) throw new Error(friendlyError(response.status));
-  const data = await response.json() as {
-    candidates?: { content?: { parts?: { text?: string; thought?: boolean }[] }; finishReason?: string }[];
-  } | null;
-  const candidate = data?.candidates?.[0];
-  if (candidate?.finishReason && candidate.finishReason !== 'STOP') {
-    throw new Error('The answer service returned an incomplete answer. Showing book evidence instead.');
-  }
-  const text = candidate?.content?.parts?.filter(part => !part.thought).map(part => part.text || '').join('');
-  if (!text) throw new Error('The answer service did not return an answer. Showing book evidence instead.');
-  let parsed: unknown;
   try {
-    parsed = JSON.parse(text);
-  } catch {
-    throw new Error('The answer service returned an incomplete answer. Showing book evidence instead.');
+    return await parseAnswerResponse(response, sources);
+  } catch (error) {
+    if (!(error instanceof Error) || !/generated output could not be verified/i.test(error.message)) {
+      throw error;
+    }
+
+    // A provider can occasionally return a structurally valid JSON envelope
+    // with an omitted field or an invalid citation. Retry once with an
+    // explicit completeness instruction before falling back to book evidence.
+    const retryBody = JSON.stringify({
+      ...JSON.parse(body),
+      systemInstruction: {
+        parts: [{
+          text: `${SYSTEM_INSTRUCTION}
+
+The previous response failed validation. Return one complete JSON object now.
+Include every required field: title, lead, findings, actions, questions and exactly
+three suggestions. Every finding or cited action must use only the supplied source
+IDs. Do not use Markdown fences or additional text.`,
+        }],
+      },
+    });
+    const retryResponse = await fetch(`${HOST}models/${model}:generateContent`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'x-goog-api-key': key },
+      body: retryBody,
+      signal: signal ? AbortSignal.any([signal, AbortSignal.timeout(8_000)]) : AbortSignal.timeout(8_000),
+    });
+    if (!retryResponse.ok) throw error;
+    return parseAnswerResponse(retryResponse, sources);
   }
-  return validateAnswer(parsed, sources);
 }
