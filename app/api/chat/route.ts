@@ -1,10 +1,11 @@
 import { z } from 'zod';
 import {
   bookAnswer, defaultProfile, emergencyAnswer, isCurrentLaw, isEmergency,
-  isOutOfScope, retrievalQuestion, search,
+  isOutOfScope, retrievalQuestion,
 } from '../../../lib/knowledge';
 import { DEFAULT_MODEL, synthesize, validModel } from '../../../lib/gemini';
 import { readBody, RequestError, responseHeaders } from '../../../lib/request';
+import { hybridSearch } from '../../../lib/rag/hybrid-search';
 
 export const dynamic = 'force-dynamic';
 const schema = z.object({
@@ -50,16 +51,16 @@ export async function POST(request: Request) {
     const retrievalQuery = briefing
       ? `fire burning ground fuel maintenance supervision escape ${profile.method} ${profile.conditions}`
       : retrievalQuestion(question, history);
-    let sources = search(retrievalQuery, profile.sector, 7, briefing);
+    let sources = hybridSearch(retrievalQuery, profile.sector, 7, briefing);
     if (briefing) {
       const topics = profile.sector === 'noncoal'
         ? ['gas well workover fire', 'escape emergency fire']
         : ['burning fiery ground old workings', 'fuel tank wiring equipment fire', 'firefighting tanker hose escape'];
-      const diverse = topics.flatMap(topic => search(`${topic} ${profile.conditions}`, profile.sector, 2, true));
+      const diverse = topics.flatMap(topic => hybridSearch(`${topic} ${profile.conditions}`, profile.sector, 2, true));
       sources = [...new Map([...diverse, ...sources].map(source => [source.id, source])).values()].slice(0, 7);
     }
     const fallback = bookAnswer(retrievalQuery, sources, profile, briefing);
-    const key = process.env.GEMINI_API_KEY?.trim() || '';
+    const key = process.env.LLM_API_KEY?.trim() || process.env.GEMINI_API_KEY?.trim() || '';
     const model = process.env.GEMINI_MODEL?.trim() || DEFAULT_MODEL;
     if (!validModel(model)) {
       return json({ ...fallback, notice: 'The answer service is not configured correctly. Showing book evidence instead.' });

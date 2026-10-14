@@ -1,5 +1,6 @@
-import { getSource, search } from '../../../lib/knowledge';
+import { getSource } from '../../../lib/knowledge';
 import { responseHeaders } from '../../../lib/request';
+import { hybridSearch } from '../../../lib/rag/hybrid-search';
 
 export async function GET(request: Request) {
   const url = new URL(request.url);
@@ -16,5 +17,5 @@ export async function GET(request: Request) {
   if (question.length > 1800 || !['all', 'coal', 'noncoal'].includes(sector)) {
     return Response.json({ error: 'Use a shorter query and a valid mine sector.' }, { status: 400, headers: responseHeaders });
   }
-  return Response.json({ sources: question.trim() ? search(question, sector, 6) : [] }, { headers: responseHeaders });
+  return Response.json({ sources: question.trim() ? hybridSearch(question, sector, 6) : [] }, { headers: responseHeaders });
 }
