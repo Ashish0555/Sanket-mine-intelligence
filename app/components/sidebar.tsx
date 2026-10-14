@@ -68,7 +68,7 @@ export function Sidebar({
     <aside
       id="workspace-navigation"
       className={
-        "sidebar enterprise-sidebar " +
+        "sidebar enterprise-sidebar fixed-viewport-sidebar " +
         (open ? "is-open " : "") +
         (collapsed ? "is-collapsed" : "")
       }

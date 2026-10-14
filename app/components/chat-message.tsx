@@ -15,6 +15,49 @@ import {
 import { Logo } from "../ui/brand";
 import type { Turn } from "../ui/conversation";
 
+const statutoryReference =
+  /\b(?:Regulation|Reg\.|Rule|Section)\s+\d+(?:\([^)]+\))?(?:\s*[-–]\s*\w+)?|\b(?:CMR|MMR)\s*(?:2017|1961)\b(?:\s*(?:Regulation|Reg\.)\s*\d+(?:\([^)]+\))?)?/gi;
+
+function renderHighlightedText(text: string) {
+  const parts = text.split(statutoryReference);
+  const matches = text.match(statutoryReference) || [];
+  return parts.flatMap((part, index) => {
+    const output = part ? [<span key={`text-${index}`}>{part}</span>] : [];
+    const match = matches[index];
+    return match
+      ? [
+          ...output,
+          <code className="statutory-badge" key={`reference-${index}`}>
+            {match}
+          </code>,
+        ]
+      : output;
+  });
+}
+
+function renderLead(lead: string) {
+  return lead.split(/\n\s*\n/).map((paragraph, index) => {
+    const sentences = paragraph
+      .split(/(?<=[.!?])\s+/)
+      .map((sentence) => sentence.trim())
+      .filter(Boolean);
+    if (sentences.length > 1) {
+      return (
+        <ul className="executive-takeaways" key={index}>
+          {sentences.map((sentence) => (
+            <li key={sentence}>{renderHighlightedText(sentence)}</li>
+          ))}
+        </ul>
+      );
+    }
+    return (
+      <p className="answer-lead" key={index}>
+        {renderHighlightedText(paragraph)}
+      </p>
+    );
+  });
+}
+
 export function ChatMessage({
   turn,
   busy,
@@ -85,11 +128,7 @@ export function ChatMessage({
         </div>
       </div>
       <h2>{a.title}</h2>
-      {a.lead.split(/\n\s*\n/).map((paragraph, i) => (
-        <p className="answer-lead" key={i} style={{ whiteSpace: "pre-line" }}>
-          {paragraph}
-        </p>
-      ))}
+      <div className="lead-summary">{renderLead(a.lead)}</div>
       {a.actions.length > 0 && (
         <section className="actions">
           <h3>

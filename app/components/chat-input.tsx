@@ -4,12 +4,21 @@ import { ArrowUp, BookOpen, ChevronDown } from "lucide-react";
 import type { RefObject } from "react";
 
 const quickActions = [
-  ["Slope stability check", "What controls should be checked for slope stability?"],
-  [
-    "Spontaneous combustion",
-    "What are the warning signs and controls for spontaneous combustion?",
-  ],
-  ["CMR 2017 search", "Find the relevant CMR 2017 regulations for this hazard."],
+  {
+    icon: "⚡",
+    label: "Slope stability check",
+    prompt: "What controls should be checked for slope stability?",
+  },
+  {
+    icon: "🔥",
+    label: "Spontaneous combustion",
+    prompt: "What are the warning signs and controls for spontaneous combustion?",
+  },
+  {
+    icon: "⚡",
+    label: "CMR 2017 search",
+    prompt: "Find the relevant CMR 2017 regulations for this hazard.",
+  },
 ];
 
 export function ChatInput({
@@ -34,15 +43,16 @@ export function ChatInput({
   return (
     <div className="composer-wrap">
       <div className="quick-action-row" aria-label="Quick actions">
-        {quickActions.map(([label, prompt], index) => (
+        {quickActions.map((item) => (
           <button
             className="quick-action-pill"
-            key={label}
+            key={item.label}
+            type="button"
             disabled={busy}
-            onClick={() => onQuickAction(prompt)}
+            onClick={() => onQuickAction(item.prompt)}
           >
-            <span>{index === 1 ? "🔥" : "⚡"}</span>
-            {label}
+            <span>{item.icon}</span>
+            <span>{item.label}</span>
           </button>
         ))}
       </div>
