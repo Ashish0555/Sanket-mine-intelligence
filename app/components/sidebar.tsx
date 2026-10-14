@@ -143,6 +143,9 @@ export function Sidebar({
             </nav>
           </section>
         ))}
+      </div>
+
+      <div className="sidebar-lower">
         <section className="sidebar-nav-group sidebar-settings">
           <p className="nav-label">SETTINGS</p>
           <button className="sidebar-settings-button" onClick={onEditProfile}>
@@ -150,41 +153,40 @@ export function Sidebar({
             <span>Mine context</span>
           </button>
         </section>
-      </div>
-
-      <div className="sidebar-status-card">
-        <div className="status-card-heading">
-          <span className="status-pulse" />
-          <span>SYSTEM STATUS</span>
-          <ShieldCheck size={14} />
+        <div className="sidebar-status-card">
+          <div className="status-card-heading">
+            <span className="status-pulse" />
+            <span>SYSTEM STATUS</span>
+            <ShieldCheck size={14} />
+          </div>
+          <strong>Database: 622 DGMS Cases Indexed</strong>
+          <span>LLM Status: Operational</span>
+          <div className="status-card-divider" />
+          <small>
+            <span className={"status-dot " + (online ? "" : "offline")} />
+            {online ? status || "Evidence connected" : "Offline · saved locally"}
+          </small>
         </div>
-        <strong>Database: 622 DGMS Cases Indexed</strong>
-        <span>LLM Status: Operational</span>
-        <div className="status-card-divider" />
-        <small>
-          <span className={"status-dot " + (online ? "" : "offline")} />
-          {online ? status || "Evidence connected" : "Offline · saved locally"}
-        </small>
-      </div>
 
-      <button className="mine-context" onClick={onEditProfile}>
-        <span className="avatar">
-          <Settings2 size={17} />
-        </span>
-        <span>
-          <strong>{profileName || "Your mine context"}</strong>
-          <small>{profileSummary}</small>
-        </span>
-        <ChevronRight size={15} />
-      </button>
-      <div className="sidebar-bottom-controls">
-        <button onClick={onToggleTheme} title="Toggle color theme">
-          {theme === "light" ? <Moon size={16} /> : <Sun size={16} />}
-          <span>{theme === "light" ? "Dark mode" : "Light mode"}</span>
+        <button className="mine-context" onClick={onEditProfile}>
+          <span className="avatar">
+            <Settings2 size={17} />
+          </span>
+          <span>
+            <strong>{profileName || "Your mine context"}</strong>
+            <small>{profileSummary}</small>
+          </span>
+          <ChevronRight size={15} />
         </button>
-        <span className="sidebar-avatar" aria-label={profileName || "User profile"}>
-          {(profileName || "S").slice(0, 1).toUpperCase()}
-        </span>
+        <div className="sidebar-bottom-controls">
+          <button onClick={onToggleTheme} title="Toggle color theme">
+            {theme === "light" ? <Moon size={16} /> : <Sun size={16} />}
+            <span>{theme === "light" ? "Dark mode" : "Light mode"}</span>
+          </button>
+          <span className="sidebar-avatar" aria-label={profileName || "User profile"}>
+            {(profileName || "S").slice(0, 1).toUpperCase()}
+          </span>
+        </div>
       </div>
     </aside>
   );

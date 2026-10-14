@@ -1916,6 +1916,12 @@ h1 span {
     flex-direction: column;
     gap: 22px;
   }
+  .sidebar-lower {
+    display: flex;
+    flex-direction: column;
+    margin-top: auto;
+    gap: 0;
+  }
   .sidebar-nav-group {
     display: grid;
     gap: 8px;
@@ -1942,7 +1948,6 @@ h1 span {
     box-shadow: inset 3px 0 #3a8069;
   }
   .sidebar-settings {
-    margin-top: auto;
     border-top: 1px solid #e3e6eb;
     padding-top: 24px;
   }
@@ -1984,6 +1989,9 @@ h1 span {
   .sidebar-status-card strong,
   .sidebar-status-card > span {
     display: block;
+    width: 100%;
+    white-space: normal;
+    overflow-wrap: anywhere;
     margin-top: 12px;
     color: #303a49;
     font-size: 11px;
@@ -1994,6 +2002,9 @@ h1 span {
     color: #7c8796;
     font-weight: 500;
     font-size: 10px;
+  }
+  .sidebar-status-card strong {
+    line-height: 1.45;
   }
   .status-card-divider {
     margin: 13px 0 10px;
